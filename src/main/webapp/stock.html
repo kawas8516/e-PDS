@@ -1,0 +1,272 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Stock Management – Admin Portal</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet"/>
+  <style>
+    body { font-family: 'Inter', sans-serif; }
+    .sidebar-btn { transition: all 0.2s; color: #94a3b8; }
+    .sidebar-btn:hover { background: #1e293b; color: #fff; }
+    .sidebar-btn.active { background: #2563eb; color: #fff; }
+    .modal { display: none; }
+    .modal.open { display: flex; }
+  </style>
+</head>
+<body class="bg-slate-50 h-screen overflow-hidden flex">
+
+  <!-- Sidebar -->
+  <aside class="w-64 bg-slate-900 text-slate-300 h-full flex flex-col p-4 shadow-xl shrink-0">
+    <div class="flex items-center gap-3 mb-10 px-2 pt-2">
+      <div class="bg-blue-600 p-2.5 rounded-xl text-white"><i data-lucide="shield-check" class="w-6 h-6"></i></div>
+      <div>
+        <h1 class="font-bold text-white text-base leading-none">Digital Ration</h1>
+        <span class="text-orange-400 text-[10px] uppercase font-bold tracking-widest">Admin Portal</span>
+      </div>
+    </div>
+    <nav class="flex-1 space-y-1">
+      <a href="admin-dashboard.html" class="sidebar-btn w-full flex items-center gap-3 px-4 py-3 rounded-xl"><i data-lucide="bar-chart-3" class="w-5 h-5"></i><span class="font-medium text-sm">System Stats</span></a>
+      <a href="approvals.html" class="sidebar-btn w-full flex items-center gap-3 px-4 py-3 rounded-xl"><i data-lucide="clock" class="w-5 h-5"></i><span class="font-medium text-sm">New Applications</span></a>
+      <a href="stock.html" class="sidebar-btn active w-full flex items-center gap-3 px-4 py-3 rounded-xl"><i data-lucide="package" class="w-5 h-5"></i><span class="font-medium text-sm">Stock Management</span></a>
+      <a href="reports.html" class="sidebar-btn w-full flex items-center gap-3 px-4 py-3 rounded-xl"><i data-lucide="file-text" class="w-5 h-5"></i><span class="font-medium text-sm">Reports</span></a>
+    </nav>
+    <div class="mt-auto pt-6 border-t border-slate-800">
+      <a href="index.html" class="w-full flex items-center gap-3 px-4 py-3 text-slate-400 hover:text-red-400 hover:bg-red-400/10 rounded-xl transition-all">
+        <i data-lucide="log-out" class="w-5 h-5"></i><span class="font-medium text-sm">Logout</span>
+      </a>
+    </div>
+  </aside>
+
+  <!-- Main -->
+  <main class="flex-1 overflow-y-auto p-8">
+    <div class="flex justify-between items-center mb-8">
+      <div>
+        <h2 class="text-2xl font-bold text-slate-800 tracking-tight">Stock Management</h2>
+        <p class="text-slate-500 text-sm mt-1">Monitor and update commodity inventory levels</p>
+      </div>
+      <button onclick="openReplenishModal()" class="bg-blue-600 text-white font-bold px-5 py-3 rounded-xl hover:bg-blue-700 transition-all shadow-lg shadow-blue-100 flex items-center gap-2 text-sm">
+        <i data-lucide="plus" class="w-4 h-4"></i> Add Stock
+      </button>
+    </div>
+
+    <!-- Alert Banner (Low Stock) -->
+    <div class="bg-red-50 border border-red-200 rounded-2xl p-4 mb-6 flex items-center gap-3">
+      <div class="w-9 h-9 bg-red-100 text-red-500 rounded-xl flex items-center justify-center shrink-0"><i data-lucide="alert-triangle" class="w-5 h-5"></i></div>
+      <div class="flex-1">
+        <p class="font-bold text-red-700 text-sm">Low Stock Alert</p>
+        <p class="text-xs text-red-600">Wheat stock is critically low (12%). Immediate replenishment required to meet October distribution.</p>
+      </div>
+      <button class="text-red-400 hover:text-red-600 transition-colors shrink-0"><i data-lucide="x" class="w-5 h-5"></i></button>
+    </div>
+
+    <!-- Stock Cards -->
+    <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
+      <div class="bg-white rounded-2xl p-5 shadow-sm border border-slate-200">
+        <div class="flex justify-between items-start mb-4">
+          <div class="w-10 h-10 bg-amber-50 text-amber-600 rounded-xl flex items-center justify-center"><i data-lucide="wheat" class="w-5 h-5"></i></div>
+          <span class="px-2 py-1 bg-red-50 text-red-500 text-[10px] font-black uppercase rounded-lg">Critical</span>
+        </div>
+        <p class="font-bold text-slate-700 text-sm">Wheat</p>
+        <p class="text-2xl font-black text-slate-800 mt-1">1,200 <span class="text-sm font-bold text-slate-400">KG</span></p>
+        <div class="mt-3 w-full h-2 bg-slate-100 rounded-full overflow-hidden">
+          <div class="w-[12%] h-full bg-red-500 rounded-full"></div>
+        </div>
+        <p class="text-xs text-red-500 font-bold mt-1">12% of 10,000 KG capacity</p>
+      </div>
+      <div class="bg-white rounded-2xl p-5 shadow-sm border border-slate-200">
+        <div class="flex justify-between items-start mb-4">
+          <div class="w-10 h-10 bg-blue-50 text-blue-600 rounded-xl flex items-center justify-center"><i data-lucide="package" class="w-5 h-5"></i></div>
+          <span class="px-2 py-1 bg-green-50 text-green-500 text-[10px] font-black uppercase rounded-lg">Good</span>
+        </div>
+        <p class="font-bold text-slate-700 text-sm">Rice</p>
+        <p class="text-2xl font-black text-slate-800 mt-1">8,200 <span class="text-sm font-bold text-slate-400">KG</span></p>
+        <div class="mt-3 w-full h-2 bg-slate-100 rounded-full overflow-hidden">
+          <div class="w-[82%] h-full bg-blue-600 rounded-full"></div>
+        </div>
+        <p class="text-xs text-slate-400 font-bold mt-1">82% of 10,000 KG capacity</p>
+      </div>
+      <div class="bg-white rounded-2xl p-5 shadow-sm border border-slate-200">
+        <div class="flex justify-between items-start mb-4">
+          <div class="w-10 h-10 bg-purple-50 text-purple-600 rounded-xl flex items-center justify-center"><i data-lucide="droplets" class="w-5 h-5"></i></div>
+          <span class="px-2 py-1 bg-amber-50 text-amber-500 text-[10px] font-black uppercase rounded-lg">Medium</span>
+        </div>
+        <p class="font-bold text-slate-700 text-sm">Kerosene</p>
+        <p class="text-2xl font-black text-slate-800 mt-1">1,500 <span class="text-sm font-bold text-slate-400">Ltr</span></p>
+        <div class="mt-3 w-full h-2 bg-slate-100 rounded-full overflow-hidden">
+          <div class="w-[30%] h-full bg-amber-500 rounded-full"></div>
+        </div>
+        <p class="text-xs text-slate-400 font-bold mt-1">30% of 5,000 Ltr capacity</p>
+      </div>
+      <div class="bg-white rounded-2xl p-5 shadow-sm border border-slate-200">
+        <div class="flex justify-between items-start mb-4">
+          <div class="w-10 h-10 bg-pink-50 text-pink-600 rounded-xl flex items-center justify-center"><i data-lucide="sparkles" class="w-5 h-5"></i></div>
+          <span class="px-2 py-1 bg-green-50 text-green-500 text-[10px] font-black uppercase rounded-lg">Good</span>
+        </div>
+        <p class="font-bold text-slate-700 text-sm">Sugar</p>
+        <p class="text-2xl font-black text-slate-800 mt-1">2,750 <span class="text-sm font-bold text-slate-400">KG</span></p>
+        <div class="mt-3 w-full h-2 bg-slate-100 rounded-full overflow-hidden">
+          <div class="w-[55%] h-full bg-blue-600 rounded-full"></div>
+        </div>
+        <p class="text-xs text-slate-400 font-bold mt-1">55% of 5,000 KG capacity</p>
+      </div>
+    </div>
+
+    <!-- Stock Table -->
+    <div class="bg-white rounded-3xl shadow-sm border border-slate-200 overflow-hidden">
+      <div class="p-6 border-b border-slate-100 flex items-center justify-between">
+        <h3 class="font-bold text-slate-800">Detailed Stock Records</h3>
+        <span class="text-xs text-slate-400">Last updated: Oct 15, 2023 09:30 AM</span>
+      </div>
+      <div class="overflow-x-auto">
+        <table class="w-full text-sm text-left">
+          <thead>
+            <tr class="text-[10px] font-bold text-slate-400 uppercase tracking-widest bg-slate-50 border-b border-slate-100">
+              <th class="px-6 py-4">Commodity</th>
+              <th class="px-6 py-4">Available</th>
+              <th class="px-6 py-4">Total Capacity</th>
+              <th class="px-6 py-4">% Stock</th>
+              <th class="px-6 py-4">Last Updated</th>
+              <th class="px-6 py-4">Status</th>
+              <th class="px-6 py-4">Actions</th>
+            </tr>
+          </thead>
+          <tbody class="divide-y divide-slate-50">
+            <tr class="hover:bg-slate-50 transition-all">
+              <td class="px-6 py-4 font-bold text-slate-700">Wheat</td>
+              <td class="px-6 py-4 text-slate-600 font-mono">1,200 KG</td>
+              <td class="px-6 py-4 text-slate-500">10,000 KG</td>
+              <td class="px-6 py-4">
+                <div class="flex items-center gap-2">
+                  <div class="w-16 h-2 bg-slate-100 rounded-full overflow-hidden">
+                    <div class="w-[12%] h-full bg-red-500 rounded-full"></div>
+                  </div>
+                  <span class="text-xs font-bold text-red-500">12%</span>
+                </div>
+              </td>
+              <td class="px-6 py-4 text-slate-500 text-xs">Oct 10, 2023</td>
+              <td class="px-6 py-4"><span class="px-3 py-1 bg-red-50 text-red-500 text-[10px] font-black uppercase rounded-full">Critical</span></td>
+              <td class="px-6 py-4 flex items-center gap-2">
+                <button onclick="openReplenishModal('Wheat')" class="text-blue-600 text-xs font-bold hover:underline flex items-center gap-1"><i data-lucide="plus-circle" class="w-4 h-4"></i> Replenish</button>
+              </td>
+            </tr>
+            <tr class="hover:bg-slate-50 transition-all">
+              <td class="px-6 py-4 font-bold text-slate-700">Rice</td>
+              <td class="px-6 py-4 text-slate-600 font-mono">8,200 KG</td>
+              <td class="px-6 py-4 text-slate-500">10,000 KG</td>
+              <td class="px-6 py-4">
+                <div class="flex items-center gap-2">
+                  <div class="w-16 h-2 bg-slate-100 rounded-full overflow-hidden">
+                    <div class="w-[82%] h-full bg-blue-600 rounded-full"></div>
+                  </div>
+                  <span class="text-xs font-bold text-slate-500">82%</span>
+                </div>
+              </td>
+              <td class="px-6 py-4 text-slate-500 text-xs">Oct 12, 2023</td>
+              <td class="px-6 py-4"><span class="px-3 py-1 bg-green-50 text-green-500 text-[10px] font-black uppercase rounded-full">Good</span></td>
+              <td class="px-6 py-4">
+                <button onclick="openReplenishModal('Rice')" class="text-blue-600 text-xs font-bold hover:underline flex items-center gap-1"><i data-lucide="plus-circle" class="w-4 h-4"></i> Replenish</button>
+              </td>
+            </tr>
+            <tr class="hover:bg-slate-50 transition-all">
+              <td class="px-6 py-4 font-bold text-slate-700">Kerosene</td>
+              <td class="px-6 py-4 text-slate-600 font-mono">1,500 Ltr</td>
+              <td class="px-6 py-4 text-slate-500">5,000 Ltr</td>
+              <td class="px-6 py-4">
+                <div class="flex items-center gap-2">
+                  <div class="w-16 h-2 bg-slate-100 rounded-full overflow-hidden">
+                    <div class="w-[30%] h-full bg-amber-500 rounded-full"></div>
+                  </div>
+                  <span class="text-xs font-bold text-amber-500">30%</span>
+                </div>
+              </td>
+              <td class="px-6 py-4 text-slate-500 text-xs">Oct 08, 2023</td>
+              <td class="px-6 py-4"><span class="px-3 py-1 bg-amber-50 text-amber-500 text-[10px] font-black uppercase rounded-full">Medium</span></td>
+              <td class="px-6 py-4">
+                <button onclick="openReplenishModal('Kerosene')" class="text-blue-600 text-xs font-bold hover:underline flex items-center gap-1"><i data-lucide="plus-circle" class="w-4 h-4"></i> Replenish</button>
+              </td>
+            </tr>
+            <tr class="hover:bg-slate-50 transition-all">
+              <td class="px-6 py-4 font-bold text-slate-700">Sugar</td>
+              <td class="px-6 py-4 text-slate-600 font-mono">2,750 KG</td>
+              <td class="px-6 py-4 text-slate-500">5,000 KG</td>
+              <td class="px-6 py-4">
+                <div class="flex items-center gap-2">
+                  <div class="w-16 h-2 bg-slate-100 rounded-full overflow-hidden">
+                    <div class="w-[55%] h-full bg-blue-600 rounded-full"></div>
+                  </div>
+                  <span class="text-xs font-bold text-slate-500">55%</span>
+                </div>
+              </td>
+              <td class="px-6 py-4 text-slate-500 text-xs">Oct 11, 2023</td>
+              <td class="px-6 py-4"><span class="px-3 py-1 bg-green-50 text-green-500 text-[10px] font-black uppercase rounded-full">Good</span></td>
+              <td class="px-6 py-4">
+                <button onclick="openReplenishModal('Sugar')" class="text-blue-600 text-xs font-bold hover:underline flex items-center gap-1"><i data-lucide="plus-circle" class="w-4 h-4"></i> Replenish</button>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </main>
+
+  <!-- Replenish Modal -->
+  <div id="replenish-modal" class="modal fixed inset-0 bg-black/50 backdrop-blur-sm z-50 items-center justify-center p-6">
+    <div class="bg-white rounded-3xl shadow-2xl w-full max-w-md border border-slate-200">
+      <div class="flex justify-between items-center p-7 border-b border-slate-100">
+        <h3 class="font-bold text-slate-800 text-lg">Replenish Stock</h3>
+        <button onclick="closeReplenishModal()" class="text-slate-400 hover:text-slate-600 transition-colors"><i data-lucide="x" class="w-6 h-6"></i></button>
+      </div>
+      <form action="StockServlet" method="POST" class="p-7 space-y-4">
+        <input type="hidden" name="action" value="replenish"/>
+        <div>
+          <label class="block text-xs font-bold text-slate-500 uppercase tracking-widest mb-1">Commodity *</label>
+          <select id="replenish-commodity" name="commodityName" required class="w-full px-4 py-3 rounded-xl bg-slate-50 border border-slate-200 focus:ring-2 focus:ring-blue-500 outline-none text-sm transition-all">
+            <option value="">Select Commodity</option>
+            <option>Wheat</option>
+            <option>Rice</option>
+            <option>Kerosene</option>
+            <option>Sugar</option>
+          </select>
+        </div>
+        <div>
+          <label class="block text-xs font-bold text-slate-500 uppercase tracking-widest mb-1">Quantity to Add *</label>
+          <div class="flex gap-2">
+            <input name="quantity" type="number" min="1" placeholder="Enter quantity" required
+              class="flex-1 px-4 py-3 rounded-xl bg-slate-50 border border-slate-200 focus:ring-2 focus:ring-blue-500 outline-none text-sm transition-all font-mono"/>
+            <select name="unit" class="px-4 py-3 rounded-xl bg-slate-50 border border-slate-200 focus:ring-2 focus:ring-blue-500 outline-none text-sm transition-all">
+              <option>KG</option>
+              <option>Ltr</option>
+            </select>
+          </div>
+        </div>
+        <div>
+          <label class="block text-xs font-bold text-slate-500 uppercase tracking-widest mb-1">Supplier Name</label>
+          <input name="supplier" type="text" placeholder="Government supplier name"
+            class="w-full px-4 py-3 rounded-xl bg-slate-50 border border-slate-200 focus:ring-2 focus:ring-blue-500 outline-none text-sm transition-all"/>
+        </div>
+        <div>
+          <label class="block text-xs font-bold text-slate-500 uppercase tracking-widest mb-1">Remarks</label>
+          <textarea name="remarks" rows="2" placeholder="Optional notes..."
+            class="w-full px-4 py-3 rounded-xl bg-slate-50 border border-slate-200 focus:ring-2 focus:ring-blue-500 outline-none text-sm transition-all resize-none"></textarea>
+        </div>
+        <div class="flex gap-3 pt-2">
+          <button type="button" onclick="closeReplenishModal()" class="flex-1 py-3 rounded-xl border border-slate-200 text-slate-600 font-bold text-sm hover:bg-slate-50 transition-all">Cancel</button>
+          <button type="submit" class="flex-1 py-3 rounded-xl bg-blue-600 text-white font-bold text-sm hover:bg-blue-700 transition-all shadow-lg shadow-blue-100">Update Stock</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <script>
+    lucide.createIcons();
+    function openReplenishModal(commodity) {
+      document.getElementById('replenish-modal').classList.add('open');
+      if (commodity) document.getElementById('replenish-commodity').value = commodity;
+    }
+    function closeReplenishModal() { document.getElementById('replenish-modal').classList.remove('open'); }
+  </script>
+</body>
+</html>

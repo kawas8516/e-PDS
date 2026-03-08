@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Reports – Admin Portal</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet"/>
+  <style>
+    body { font-family: 'Inter', sans-serif; }
+    .sidebar-btn { transition: all 0.2s; color: #94a3b8; }
+    .sidebar-btn:hover { background: #1e293b; color: #fff; }
+    .sidebar-btn.active { background: #2563eb; color: #fff; }
+  </style>
+</head>
+<body class="bg-slate-50 h-screen overflow-hidden flex">
+
+  <!-- Sidebar -->
+  <aside class="w-64 bg-slate-900 text-slate-300 h-full flex flex-col p-4 shadow-xl shrink-0">
+    <div class="flex items-center gap-3 mb-10 px-2 pt-2">
+      <div class="bg-blue-600 p-2.5 rounded-xl text-white"><i data-lucide="shield-check" class="w-6 h-6"></i></div>
+      <div>
+        <h1 class="font-bold text-white text-base leading-none">Digital Ration</h1>
+        <span class="text-orange-400 text-[10px] uppercase font-bold tracking-widest">Admin Portal</span>
+      </div>
+    </div>
+    <nav class="flex-1 space-y-1">
+      <a href="admin-dashboard.html" class="sidebar-btn w-full flex items-center gap-3 px-4 py-3 rounded-xl"><i data-lucide="bar-chart-3" class="w-5 h-5"></i><span class="font-medium text-sm">System Stats</span></a>
+      <a href="approvals.html" class="sidebar-btn w-full flex items-center gap-3 px-4 py-3 rounded-xl"><i data-lucide="clock" class="w-5 h-5"></i><span class="font-medium text-sm">New Applications</span></a>
+      <a href="stock.html" class="sidebar-btn w-full flex items-center gap-3 px-4 py-3 rounded-xl"><i data-lucide="package" class="w-5 h-5"></i><span class="font-medium text-sm">Stock Management</span></a>
+      <a href="reports.html" class="sidebar-btn active w-full flex items-center gap-3 px-4 py-3 rounded-xl"><i data-lucide="file-text" class="w-5 h-5"></i><span class="font-medium text-sm">Reports</span></a>
+    </nav>
+    <div class="mt-auto pt-6 border-t border-slate-800">
+      <a href="index.html" class="w-full flex items-center gap-3 px-4 py-3 text-slate-400 hover:text-red-400 hover:bg-red-400/10 rounded-xl transition-all">
+        <i data-lucide="log-out" class="w-5 h-5"></i><span class="font-medium text-sm">Logout</span>
+      </a>
+    </div>
+  </aside>
+
+  <!-- Main -->
+  <main class="flex-1 overflow-y-auto p-8">
+    <div class="mb-8">
+      <h2 class="text-2xl font-bold text-slate-800 tracking-tight">Reports & Analytics</h2>
+      <p class="text-slate-500 text-sm mt-1">Generate and download system reports</p>
+    </div>
+
+    <!-- Report Type Cards -->
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-5 mb-8">
+
+      <!-- Monthly Stock Report -->
+      <div class="bg-white rounded-3xl p-7 shadow-sm border border-slate-200 hover:border-blue-200 transition-all group">
+        <div class="flex items-start justify-between mb-4">
+          <div class="w-14 h-14 bg-blue-50 text-blue-600 rounded-2xl flex items-center justify-center group-hover:bg-blue-100 transition-all">
+            <i data-lucide="bar-chart-2" class="w-7 h-7"></i>
+          </div>
+          <span class="px-3 py-1 bg-green-50 text-green-600 text-[10px] font-black uppercase rounded-lg">Ready</span>
+        </div>
+        <h3 class="font-bold text-slate-800 mb-1">Monthly Stock Report</h3>
+        <p class="text-sm text-slate-500 mb-5">Summary of stock received, distributed, and remaining per commodity per month.</p>
+        <div class="flex gap-2 items-center mb-5">
+          <label class="text-xs font-bold text-slate-500 uppercase tracking-widest">Month</label>
+          <select class="ml-2 px-3 py-2 rounded-xl bg-slate-50 border border-slate-200 text-sm outline-none focus:ring-2 focus:ring-blue-500">
+            <option>October 2023</option>
+            <option>September 2023</option>
+            <option>August 2023</option>
+          </select>
+        </div>
+        <button onclick="generateReport('stock')" class="w-full py-3 bg-blue-600 text-white font-bold rounded-xl hover:bg-blue-700 transition-all shadow-lg shadow-blue-100 text-sm flex items-center justify-center gap-2">
+          <i data-lucide="download" class="w-4 h-4"></i> Generate Report
+        </button>
+      </div>
+
+      <!-- Distribution Report -->
+      <div class="bg-white rounded-3xl p-7 shadow-sm border border-slate-200 hover:border-blue-200 transition-all group">
+        <div class="flex items-start justify-between mb-4">
+          <div class="w-14 h-14 bg-green-50 text-green-600 rounded-2xl flex items-center justify-center group-hover:bg-green-100 transition-all">
+            <i data-lucide="truck" class="w-7 h-7"></i>
+          </div>
+          <span class="px-3 py-1 bg-green-50 text-green-600 text-[10px] font-black uppercase rounded-lg">Ready</span>
+        </div>
+        <h3 class="font-bold text-slate-800 mb-1">Ration Distribution Report</h3>
+        <p class="text-sm text-slate-500 mb-5">Detailed log of ration collected by each citizen – for audit and verification.</p>
+        <div class="flex gap-2 items-center mb-5">
+          <label class="text-xs font-bold text-slate-500 uppercase tracking-widest">Month</label>
+          <select class="ml-2 px-3 py-2 rounded-xl bg-slate-50 border border-slate-200 text-sm outline-none focus:ring-2 focus:ring-blue-500">
+            <option>October 2023</option>
+            <option>September 2023</option>
+          </select>
+        </div>
+        <button onclick="generateReport('distribution')" class="w-full py-3 bg-green-600 text-white font-bold rounded-xl hover:bg-green-700 transition-all shadow-lg shadow-green-100 text-sm flex items-center justify-center gap-2">
+          <i data-lucide="download" class="w-4 h-4"></i> Generate Report
+        </button>
+      </div>
+
+      <!-- Citizen Allocation Report -->
+      <div class="bg-white rounded-3xl p-7 shadow-sm border border-slate-200 hover:border-blue-200 transition-all group">
+        <div class="flex items-start justify-between mb-4">
+          <div class="w-14 h-14 bg-purple-50 text-purple-600 rounded-2xl flex items-center justify-center group-hover:bg-purple-100 transition-all">
+            <i data-lucide="users" class="w-7 h-7"></i>
+          </div>
+          <span class="px-3 py-1 bg-green-50 text-green-600 text-[10px] font-black uppercase rounded-lg">Ready</span>
+        </div>
+        <h3 class="font-bold text-slate-800 mb-1">Citizen-wise Allocation</h3>
+        <p class="text-sm text-slate-500 mb-5">Individual ration entitlement breakdown for each registered citizen / card.</p>
+        <div class="flex gap-2 items-center mb-5">
+          <label class="text-xs font-bold text-slate-500 uppercase tracking-widest">Region</label>
+          <select class="ml-2 px-3 py-2 rounded-xl bg-slate-50 border border-slate-200 text-sm outline-none focus:ring-2 focus:ring-blue-500">
+            <option>Region 04 (All)</option>
+            <option>Sub-Region A</option>
+            <option>Sub-Region B</option>
+          </select>
+        </div>
+        <button onclick="generateReport('allocation')" class="w-full py-3 bg-purple-600 text-white font-bold rounded-xl hover:bg-purple-700 transition-all shadow-lg shadow-purple-100 text-sm flex items-center justify-center gap-2">
+          <i data-lucide="download" class="w-4 h-4"></i> Generate Report
+        </button>
+      </div>
+
+      <!-- Complaints Report -->
+      <div class="bg-white rounded-3xl p-7 shadow-sm border border-slate-200 hover:border-blue-200 transition-all group">
+        <div class="flex items-start justify-between mb-4">
+          <div class="w-14 h-14 bg-red-50 text-red-500 rounded-2xl flex items-center justify-center group-hover:bg-red-100 transition-all">
+            <i data-lucide="alert-circle" class="w-7 h-7"></i>
+          </div>
+          <span class="px-3 py-1 bg-green-50 text-green-600 text-[10px] font-black uppercase rounded-lg">Ready</span>
+        </div>
+        <h3 class="font-bold text-slate-800 mb-1">Complaint Status Report</h3>
+        <p class="text-sm text-slate-500 mb-5">Overview of all complaints filed, resolved, and pending by category and timeline.</p>
+        <div class="flex gap-2 items-center mb-5">
+          <label class="text-xs font-bold text-slate-500 uppercase tracking-widest">Quarter</label>
+          <select class="ml-2 px-3 py-2 rounded-xl bg-slate-50 border border-slate-200 text-sm outline-none focus:ring-2 focus:ring-blue-500">
+            <option>Q3 2023</option>
+            <option>Q2 2023</option>
+          </select>
+        </div>
+        <button onclick="generateReport('complaints')" class="w-full py-3 bg-red-500 text-white font-bold rounded-xl hover:bg-red-600 transition-all shadow-lg shadow-red-100 text-sm flex items-center justify-center gap-2">
+          <i data-lucide="download" class="w-4 h-4"></i> Generate Report
+        </button>
+      </div>
+    </div>
+
+    <!-- Recent Downloads -->
+    <div class="bg-white rounded-3xl shadow-sm border border-slate-200 p-7">
+      <h3 class="font-bold text-slate-800 mb-5">Recent Report Downloads</h3>
+      <div class="space-y-3">
+        <div class="flex items-center justify-between p-4 bg-slate-50 rounded-2xl">
+          <div class="flex items-center gap-3">
+            <div class="w-10 h-10 bg-blue-50 text-blue-600 rounded-xl flex items-center justify-center"><i data-lucide="file-bar-chart" class="w-5 h-5"></i></div>
+            <div><p class="font-bold text-slate-700 text-sm">Monthly Stock Report – Sep 2023</p><p class="text-xs text-slate-400">Generated Oct 01, 2023</p></div>
+          </div>
+          <button class="text-blue-600 hover:text-blue-800 transition-colors"><i data-lucide="download" class="w-5 h-5"></i></button>
+        </div>
+        <div class="flex items-center justify-between p-4 bg-slate-50 rounded-2xl">
+          <div class="flex items-center gap-3">
+            <div class="w-10 h-10 bg-green-50 text-green-600 rounded-xl flex items-center justify-center"><i data-lucide="file-check" class="w-5 h-5"></i></div>
+            <div><p class="font-bold text-slate-700 text-sm">Distribution Report – Sep 2023</p><p class="text-xs text-slate-400">Generated Oct 01, 2023</p></div>
+          </div>
+          <button class="text-blue-600 hover:text-blue-800 transition-colors"><i data-lucide="download" class="w-5 h-5"></i></button>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <script>
+    lucide.createIcons();
+    function generateReport(type) {
+      alert(`Generating ${type} report...\n\nIn the real app, this will call ReportServlet?type=${type} to generate a PDF/Excel file from the database.`);
+    }
+  </script>
+</body>
+</html>
