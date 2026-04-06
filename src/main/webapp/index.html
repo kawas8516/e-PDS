@@ -72,17 +72,10 @@
           </div>
         </div>
 
-        <!-- Hidden role field — set by which button is clicked -->
-        <input type="hidden" name="role" id="role-input" value="citizen"/>
-
-        <div class="flex gap-3 pt-2">
-          <button type="submit" onclick="setRole('citizen')"
-            class="flex-1 bg-blue-600 text-white font-bold py-3 rounded-xl hover:bg-blue-700 transition-all shadow-lg shadow-blue-200 flex items-center justify-center gap-2 text-sm">
-            <i data-lucide="user-circle" class="w-4 h-4"></i> Citizen Login
-          </button>
-          <button type="submit" onclick="setRole('admin')"
-            class="flex-1 bg-slate-800 text-white font-bold py-3 rounded-xl hover:bg-slate-900 transition-all shadow-lg shadow-slate-200 flex items-center justify-center gap-2 text-sm">
-            <i data-lucide="shield" class="w-4 h-4"></i> Admin Portal
+        <div class="pt-2">
+          <button type="submit"
+            class="w-full bg-blue-600 text-white font-bold py-3 rounded-xl hover:bg-blue-700 transition-all shadow-lg shadow-blue-200 flex items-center justify-center gap-2 text-sm">
+            <i data-lucide="log-in" class="w-4 h-4"></i> Login
           </button>
         </div>
       </form>
@@ -97,14 +90,23 @@
   <script>
     lucide.createIcons();
 
-    function setRole(role) {
-      document.getElementById('role-input').value = role;
+        const err = document.getElementById('login-error');
+    const query = new URLSearchParams(window.location.search);
+    const serverError = query.get('error');
+    const lastUsername = query.get('lastUsername');
+
+    if (lastUsername) {
+      document.getElementById('username').value = lastUsername;
+    }
+
+    if (serverError) {
+      err.textContent = serverError;
+      err.classList.add('show');
     }
 
     document.getElementById('login-form').addEventListener('submit', function(e) {
       const username = document.getElementById('username').value.trim();
       const password = document.getElementById('password').value.trim();
-      const err = document.getElementById('login-error');
 
       err.classList.remove('show');
 
