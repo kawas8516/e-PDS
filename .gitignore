@@ -22,3 +22,6 @@ Servers/
 # OS files
 .DS_Store
 Thumbs.db
+
+# Libraries (container provided)
+*.jar
