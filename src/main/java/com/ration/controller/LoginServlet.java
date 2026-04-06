@@ -1,7 +1,7 @@
 package com.ration.controller;
 
 import com.ration.model.User;
-import com.ration.service.AuthService;
+
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
@@ -16,7 +16,21 @@ import java.nio.charset.StandardCharsets;
 @WebServlet("/LoginServlet")
 public class LoginServlet extends HttpServlet {
 
-    private static final long serialVersionUID = 1L;
+    public class AuthService {
+
+		public String getDashboardPath(User user) {
+			// TODO Auto-generated method stub
+			return null;
+		}
+
+		public User authenticate(String username, String password) {
+			// TODO Auto-generated method stub
+			return null;
+		}
+
+	}
+
+	private static final long serialVersionUID = 1L;
     private static final int SESSION_TIMEOUT_SECONDS = 30 * 60;
 
     private AuthService authService;
