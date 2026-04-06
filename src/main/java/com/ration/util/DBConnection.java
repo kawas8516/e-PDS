@@ -1,53 +1,75 @@
 package com.ration.util;
 
+import java.io.IOException;
+import java.io.InputStream;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
+import java.util.Properties;
 
-/**
- * ─────────────────────────────────────────────────────────────────
- *  DBConnection.java
- *  Utility class that provides a JDBC connection to PostgreSQL.
- *
- *  PostgreSQL Driver dependency (add to pom.xml):
- *  <dependency>
- *      <groupId>org.postgresql</groupId>
- *      <artifactId>postgresql</artifactId>
- *      <version>42.7.1</version>
- *  </dependency>
- * ─────────────────────────────────────────────────────────────────
- */
-public class DBConnection {
+public final class DBConnection {
 
-    // ── PostgreSQL connection settings ────────────────────────────
-    private static final String DB_URL      = "jdbc:postgresql://localhost:5432/ration_db";
-    private static final String DB_USER     = "postgres";        // change to your DB username
-    private static final String DB_PASSWORD = "your_db_password"; // change to your DB password
+    private static final String DB_URL;
+    private static final String DB_USER;
+    private static final String DB_PASSWORD;
 
-    // Load the PostgreSQL JDBC driver once when class is loaded
     static {
         try {
             Class.forName("org.postgresql.Driver");
         } catch (ClassNotFoundException e) {
+            throw new ExceptionInInitializerError("PostgreSQL JDBC Driver not found: " + e.getMessage());
+        }
+
+        Properties fallbackProperties = loadDbProperties();
+
+        DB_URL = resolveValue("DB_URL", "db.url", fallbackProperties);
+        DB_USER = resolveValue("DB_USER", "db.user", fallbackProperties);
+        DB_PASSWORD = resolveValue("DB_PASSWORD", "db.password", fallbackProperties);
+
+        if (isBlank(DB_URL) || isBlank(DB_USER) || isBlank(DB_PASSWORD)) {
             throw new ExceptionInInitializerError(
-                "PostgreSQL JDBC Driver not found. Add postgresql JAR to classpath.\n" + e.getMessage()
+                    "Database configuration is incomplete. Configure DB_URL, DB_USER, DB_PASSWORD as "
+                            + "environment variables or in src/main/resources/db.properties."
             );
         }
     }
 
-    // Prevent instantiation
-    private DBConnection() {}
+    private DBConnection() {
+    }
 
-    /**
-     * Returns a fresh JDBC Connection to PostgreSQL.
-     * CALLER IS RESPONSIBLE for closing it (use try-with-resources).
-     *
-     * Usage:
-     *   try (Connection conn = DBConnection.getConnection()) {
-     *       // use conn
-     *   }
-     */
     public static Connection getConnection() throws SQLException {
         return DriverManager.getConnection(DB_URL, DB_USER, DB_PASSWORD);
+    }
+
+    private static String resolveValue(String envKey, String propertyKey, Properties properties) {
+        String envValue = System.getenv(envKey);
+        if (!isBlank(envValue)) {
+            return envValue.trim();
+        }
+
+        String propertyValue = properties.getProperty(propertyKey);
+        if (!isBlank(propertyValue)) {
+            return propertyValue.trim();
+        }
+
+        return null;
+    }
+
+    private static Properties loadDbProperties() {
+        Properties properties = new Properties();
+
+        try (InputStream inputStream = DBConnection.class.getClassLoader().getResourceAsStream("db.properties")) {
+            if (inputStream != null) {
+                properties.load(inputStream);
+            }
+        } catch (IOException e) {
+            throw new ExceptionInInitializerError("Failed to load db.properties: " + e.getMessage());
+        }
+
+        return properties;
+    }
+
+    private static boolean isBlank(String value) {
+        return value == null || value.trim().isEmpty();
     }
 }
