@@ -1,5 +1,5 @@
 # 📘 Digital Ration Card Management System
-
+[![Ask DeepWiki](https://deepwiki.com/badge.svg)](https://deepwiki.com/kawas8516/e-PDS)
 ## 📌 Project Overview
 
 The **Digital Ration Card Management System** is a Java-based desktop application designed to automate and digitize the ration card management process. It replaces the traditional manual system with a secure, efficient, and transparent digital solution accessible to both **citizens** and **administrators**.
