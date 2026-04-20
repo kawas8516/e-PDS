@@ -22,6 +22,9 @@ Servers/
 # Local scratch / throwaway scripts (may contain hardcoded creds — do NOT commit)
 scratch/
 
+# DB credentials — keep secrets out of git; use env vars DB_URL / DB_USER / DB_PASSWORD
+src/main/resources/db.properties
+
 # OS files
 .DS_Store
 Thumbs.db

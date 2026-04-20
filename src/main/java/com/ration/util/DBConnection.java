@@ -24,7 +24,9 @@ public final class DBConnection {
         }
 
         if (isBlank(url) || isBlank(user) || isBlank(password)) {
-            throw new ExceptionInInitializerError("Missing db.url, db.user, or db.password in db.properties.");
+            throw new ExceptionInInitializerError(
+                "DB config incomplete. Set DB_URL, DB_USER, DB_PASSWORD env vars " +
+                "or fill in db.properties.");
         }
     }
 
@@ -45,15 +47,22 @@ public final class DBConnection {
             properties.load(inputStream);
         }
 
-        url = trimToNull(properties.getProperty("db.url"));
-        user = trimToNull(properties.getProperty("db.user"));
-        password = trimToNull(properties.getProperty("db.password"));
+        // Env vars take priority over db.properties so secrets stay out of git.
+        url      = firstNonBlank(System.getenv("DB_URL"),      properties.getProperty("db.url"));
+        user     = firstNonBlank(System.getenv("DB_USER"),     properties.getProperty("db.user"));
+        password = firstNonBlank(System.getenv("DB_PASSWORD"), properties.getProperty("db.password"));
+    }
+
+    private static String firstNonBlank(String... values) {
+        for (String v : values) {
+            String t = trimToNull(v);
+            if (t != null) return t;
+        }
+        return null;
     }
 
     private static String trimToNull(String value) {
-        if (value == null) {
-            return null;
-        }
+        if (value == null) return null;
         String trimmed = value.trim();
         return trimmed.isEmpty() ? null : trimmed;
     }
