@@ -2,16 +2,17 @@ package com.ration.controller;
 
 import com.ration.model.User;
 import com.ration.service.AuthService;
-import com.ration.util.AuditUtil;
-import com.ration.util.CSRFUtil;
 
-import javax.servlet.ServletException;
-import javax.servlet.annotation.WebServlet;
-import javax.servlet.http.HttpServlet;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import javax.servlet.http.HttpSession;
+import jakarta.servlet.ServletException;
+import jakarta.servlet.annotation.WebServlet;
+import jakarta.servlet.http.HttpServlet;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpSession;
+
 import java.io.IOException;
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 
 @WebServlet("/LoginServlet")
 public class LoginServlet extends HttpServlet {
@@ -31,89 +32,82 @@ public class LoginServlet extends HttpServlet {
             throws ServletException, IOException {
 
         HttpSession existingSession = request.getSession(false);
-        User user = existingSession == null ? null : (User) existingSession.getAttribute("user");
 
-        if (user != null) {
-            redirectByRole(user, request, response);
+        if (existingSession != null && existingSession.getAttribute("user") != null) {
+            User user = (User) existingSession.getAttribute("user");
+            response.sendRedirect(request.getContextPath() + authService.getDashboardPath(user));
             return;
         }
 
-        HttpSession session = request.getSession(true);
-        if (session.getAttribute("csrfToken") == null) {
-            session.setAttribute("csrfToken", CSRFUtil.generateToken());
-        }
-
-        request.getRequestDispatcher("/index.jsp").forward(request, response);
+        response.sendRedirect(request.getContextPath() + "/index.html");
     }
 
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
 
-        HttpSession sessionForToken = request.getSession(false);
-        String sessionToken = sessionForToken == null ? null : (String) sessionForToken.getAttribute("csrfToken");
-        String requestToken = request.getParameter("csrfToken");
-
-        if (!CSRFUtil.validateToken(sessionToken, requestToken)) {
-            AuditUtil.logAction(0, "LOGIN_FAIL_CSRF", request.getRemoteAddr());
-            response.sendError(HttpServletResponse.SC_FORBIDDEN, "Invalid CSRF token");
-            return;
-        }
-
         String username = request.getParameter("username");
         String password = request.getParameter("password");
 
         if (isBlank(username)) {
-            AuditUtil.logAction(0, "LOGIN_FAIL", request.getRemoteAddr());
-            forwardLoginError(request, response, "Username or Aadhaar number is required.", username);
+            redirectWithError(request, response, "Username or Aadhaar number is required.", username);
             return;
         }
 
         if (isBlank(password)) {
-            AuditUtil.logAction(0, "LOGIN_FAIL", request.getRemoteAddr());
-            forwardLoginError(request, response, "Password is required.", username);
+            redirectWithError(request, response, "Password is required.", username);
             return;
         }
 
         User user = authService.authenticate(username, password);
+
         if (user == null) {
-            AuditUtil.logAction(0, "LOGIN_FAIL", request.getRemoteAddr());
-            forwardLoginError(request, response, "Invalid username or password. Please try again.", username);
+            redirectWithError(request, response, "Invalid username or password.", username);
             return;
         }
 
+        // Invalidate old session
         HttpSession oldSession = request.getSession(false);
         if (oldSession != null) {
             oldSession.invalidate();
         }
 
-        HttpSession session = request.getSession();
+        // Create new session
+        HttpSession session = request.getSession(true);
         session.setMaxInactiveInterval(SESSION_TIMEOUT_SECONDS);
         session.setAttribute("user", user);
         session.setAttribute("csrfToken", CSRFUtil.generateToken());
 
-        AuditUtil.logAction(user.getUserId(), "LOGIN_SUCCESS", request.getRemoteAddr());
+        // Store user info
+        session.setAttribute("user", user);
+        session.setAttribute("userId", user.getUserId());
+        session.setAttribute("username", user.getUsername());
+        session.setAttribute("fullName", user.getFullName());
+        session.setAttribute("role", user.getRole());
 
-        redirectByRole(user, request, response);
+        // Redirect to dashboard
+        response.sendRedirect(request.getContextPath() + authService.getDashboardPath(user));
     }
 
-    private void redirectByRole(User user, HttpServletRequest request, HttpServletResponse response) throws IOException {
-        if ("ADMIN".equalsIgnoreCase(user.getRole())) {
-            response.sendRedirect(request.getContextPath() + "/admin-dashboard.jsp");
-        } else {
-            response.sendRedirect(request.getContextPath() + "/citizen-dashboard.jsp");
-        }
-    }
-
-    private void forwardLoginError(HttpServletRequest request,
+    private void redirectWithError(HttpServletRequest request,
                                    HttpServletResponse response,
                                    String errorMessage,
                                    String username)
-            throws ServletException, IOException {
+            throws IOException {
 
-        request.setAttribute("error", errorMessage);
-        request.setAttribute("lastUsername", username == null ? "" : username.trim());
-        request.getRequestDispatcher("/index.jsp").forward(request, response);
+        String encodedError = URLEncoder.encode(errorMessage, StandardCharsets.UTF_8.name());
+        String encodedUsername = URLEncoder.encode(
+                username == null ? "" : username.trim(),
+                StandardCharsets.UTF_8.name()
+        );
+
+        response.sendRedirect(request.getContextPath() +
+                "/index.html?error=" + encodedError +
+                "&lastUsername=" + encodedUsername);
+    }
+
+    private boolean isBlank(String value) {
+        return value == null || value.trim().isEmpty();
     }
 
     private boolean isBlank(String value) {
