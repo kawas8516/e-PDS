@@ -1,6 +1,7 @@
 package com.ration.controller;
 
 import com.ration.model.User;
+import com.ration.service.AuthService;
 
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
@@ -16,21 +17,7 @@ import java.nio.charset.StandardCharsets;
 @WebServlet("/LoginServlet")
 public class LoginServlet extends HttpServlet {
 
-    public class AuthService {
-
-		public String getDashboardPath(User user) {
-			// TODO Auto-generated method stub
-			return null;
-		}
-
-		public User authenticate(String username, String password) {
-			// TODO Auto-generated method stub
-			return null;
-		}
-
-	}
-
-	private static final long serialVersionUID = 1L;
+    private static final long serialVersionUID = 1L;
     private static final int SESSION_TIMEOUT_SECONDS = 30 * 60;
 
     private AuthService authService;
@@ -45,8 +32,9 @@ public class LoginServlet extends HttpServlet {
             throws ServletException, IOException {
 
         HttpSession existingSession = request.getSession(false);
-        if (existingSession != null && existingSession.getAttribute("loggedInUser") != null) {
-            User user = (User) existingSession.getAttribute("loggedInUser");
+
+        if (existingSession != null && existingSession.getAttribute("user") != null) {
+            User user = (User) existingSession.getAttribute("user");
             response.sendRedirect(request.getContextPath() + authService.getDashboardPath(user));
             return;
         }
@@ -74,24 +62,28 @@ public class LoginServlet extends HttpServlet {
         User user = authService.authenticate(username, password);
 
         if (user == null) {
-            redirectWithError(request, response, "Invalid username or password. Please try again.", username);
+            redirectWithError(request, response, "Invalid username or password.", username);
             return;
         }
 
+        // Invalidate old session
         HttpSession oldSession = request.getSession(false);
         if (oldSession != null) {
             oldSession.invalidate();
         }
 
+        // Create new session
         HttpSession session = request.getSession(true);
         session.setMaxInactiveInterval(SESSION_TIMEOUT_SECONDS);
 
-        session.setAttribute("loggedInUser", user);
+        // Store user info
+        session.setAttribute("user", user);
         session.setAttribute("userId", user.getUserId());
         session.setAttribute("username", user.getUsername());
         session.setAttribute("fullName", user.getFullName());
         session.setAttribute("role", user.getRole());
 
+        // Redirect to dashboard
         response.sendRedirect(request.getContextPath() + authService.getDashboardPath(user));
     }
 
@@ -107,8 +99,9 @@ public class LoginServlet extends HttpServlet {
                 StandardCharsets.UTF_8.name()
         );
 
-        response.sendRedirect(request.getContextPath() + "/index.html?error=" + encodedError
-                + "&lastUsername=" + encodedUsername);
+        response.sendRedirect(request.getContextPath() +
+                "/index.html?error=" + encodedError +
+                "&lastUsername=" + encodedUsername);
     }
 
     private boolean isBlank(String value) {

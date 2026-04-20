@@ -9,28 +9,22 @@ import java.util.Properties;
 
 public final class DBConnection {
 
-    private static final String DB_URL;
-    private static final String DB_USER;
-    private static final String DB_PASSWORD;
+    private static String url;
+    private static String user;
+    private static String password;
 
     static {
         try {
             Class.forName("org.postgresql.Driver");
+            loadDbProperties();
         } catch (ClassNotFoundException e) {
             throw new ExceptionInInitializerError("PostgreSQL JDBC Driver not found: " + e.getMessage());
+        } catch (IOException e) {
+            throw new ExceptionInInitializerError("Unable to load db.properties: " + e.getMessage());
         }
 
-        Properties fallbackProperties = loadDbProperties();
-
-        DB_URL = resolveValue("DB_URL", "db.url", fallbackProperties);
-        DB_USER = resolveValue("DB_USER", "db.user", fallbackProperties);
-        DB_PASSWORD = resolveValue("DB_PASSWORD", "db.password", fallbackProperties);
-
-        if (isBlank(DB_URL) || isBlank(DB_USER) || isBlank(DB_PASSWORD)) {
-            throw new ExceptionInInitializerError(
-                    "Database configuration is incomplete. Configure DB_URL, DB_USER, DB_PASSWORD as "
-                            + "environment variables or in src/main/resources/db.properties."
-            );
+        if (isBlank(url) || isBlank(user) || isBlank(password)) {
+            throw new ExceptionInInitializerError("Missing db.url, db.user, or db.password in db.properties.");
         }
     }
 
@@ -38,35 +32,30 @@ public final class DBConnection {
     }
 
     public static Connection getConnection() throws SQLException {
-        return DriverManager.getConnection(DB_URL, DB_USER, DB_PASSWORD);
+        return DriverManager.getConnection(url, user, password);
     }
 
-    private static String resolveValue(String envKey, String propertyKey, Properties properties) {
-        String envValue = System.getenv(envKey);
-        if (!isBlank(envValue)) {
-            return envValue.trim();
-        }
-
-        String propertyValue = properties.getProperty(propertyKey);
-        if (!isBlank(propertyValue)) {
-            return propertyValue.trim();
-        }
-
-        return null;
-    }
-
-    private static Properties loadDbProperties() {
+    private static void loadDbProperties() throws IOException {
         Properties properties = new Properties();
 
         try (InputStream inputStream = DBConnection.class.getClassLoader().getResourceAsStream("db.properties")) {
-            if (inputStream != null) {
-                properties.load(inputStream);
+            if (inputStream == null) {
+                throw new IOException("db.properties not found in classpath.");
             }
-        } catch (IOException e) {
-            throw new ExceptionInInitializerError("Failed to load db.properties: " + e.getMessage());
+            properties.load(inputStream);
         }
 
-        return properties;
+        url = trimToNull(properties.getProperty("db.url"));
+        user = trimToNull(properties.getProperty("db.user"));
+        password = trimToNull(properties.getProperty("db.password"));
+    }
+
+    private static String trimToNull(String value) {
+        if (value == null) {
+            return null;
+        }
+        String trimmed = value.trim();
+        return trimmed.isEmpty() ? null : trimmed;
     }
 
     private static boolean isBlank(String value) {
