@@ -1,4 +1,5 @@
 <%@ page contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" %>
+<%@ taglib prefix="c" uri="jakarta.tags.core" %>
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -31,19 +32,21 @@
       </div>
 
       <div id="login-error" class="error-box mb-4 p-3 bg-red-50 border border-red-200 text-red-700 rounded-xl text-sm font-medium">${error}</div>
-      <div class="mb-4 p-3 bg-green-50 border border-green-200 text-green-700 rounded-xl text-sm font-medium">${success}</div>
+      <c:if test="${not empty success}">
+        <div class="mb-4 p-3 bg-green-50 border border-green-200 text-green-700 rounded-xl text-sm font-medium">${success}</div>
+      </c:if>
 
       <form id="login-form" action="${pageContext.request.contextPath}/LoginServlet" method="post" class="space-y-5" novalidate>
         <input type="hidden" name="csrfToken" value="${sessionScope.csrfToken}">
         <div>
-          <label class="block text-sm font-semibold text-slate-700 mb-1">Aadhaar / Username</label>
+          <label class="block text-sm font-semibold text-slate-700 mb-1">Username</label>
           <div class="relative">
             <span class="absolute inset-y-0 left-3 flex items-center text-slate-400">
               <i data-lucide="user" class="w-5 h-5"></i>
             </span>
             <input id="username" name="username" type="text"
                    value="${lastUsername}"
-                   placeholder="Enter 12-digit Aadhaar or Username"
+                   placeholder="Enter your username"
                    class="w-full pl-11 pr-4 py-3 rounded-xl bg-slate-50 border border-slate-200 focus:ring-2 focus:ring-blue-500 transition-all text-sm"/>
           </div>
         </div>
@@ -67,8 +70,9 @@
           </button>
         </div>
       </form>
-      <div class="mt-4 text-sm">
-        <a href="${pageContext.request.contextPath}/ResetPasswordServlet" class="text-blue-600">Forgot password?</a>
+      <div class="mt-4 text-sm flex justify-between">
+        <a href="${pageContext.request.contextPath}/ResetPasswordServlet" class="text-blue-600 hover:underline">Forgot password?</a>
+        <a href="${pageContext.request.contextPath}/RegisterServlet" class="text-slate-500 hover:text-blue-600 font-medium">New user? Register</a>
       </div>
     </div>
   </div>
@@ -89,7 +93,7 @@
 
       if (!username) {
         e.preventDefault();
-        errorBox.textContent = 'Please enter your Aadhaar number or username.';
+        errorBox.textContent = 'Please enter your username.';
         errorBox.classList.add('show');
         return;
       }

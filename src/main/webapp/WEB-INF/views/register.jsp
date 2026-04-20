@@ -1,3 +1,6 @@
+<%@ page contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" %>
+<%@ taglib prefix="c" uri="jakarta.tags.core" %>
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -11,7 +14,7 @@
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
         body { font-family: 'Inter', sans-serif; }
-        
+
         .step-content { display: none; animation: slideIn 0.3s ease-out; }
         .step-content.active { display: block; }
 
@@ -32,21 +35,27 @@
                 <i data-lucide="user-plus" class="w-8 h-8"></i>
                 <h1 class="text-2xl font-bold">New Citizen Registration</h1>
             </div>
-            <p class="text-blue-100 text-sm mb-6">Complete the 3-step process to apply for your digital ration card.</p>
-            
+            <p class="text-blue-100 text-sm mb-6">Complete the registration to access your digital ration profile.</p>
+
             <div class="w-full bg-blue-800/50 h-2 rounded-full overflow-hidden">
-                <div id="progress" class="progress-bar bg-white h-full w-1/3"></div>
+                <div id="progress" class="progress-bar bg-white h-full w-1/2"></div>
             </div>
             <div class="flex justify-between mt-3 text-[10px] font-bold uppercase tracking-widest text-blue-200">
                 <span>Account</span>
                 <span>Verification</span>
-                <span>Household</span>
             </div>
         </div>
 
         <!-- Registration Form -->
-        <form action="AuthServlet" method="POST" id="regForm" class="p-8">
-            <input type="hidden" name="action" value="register">
+        <form action="${pageContext.request.contextPath}/RegisterServlet" method="POST" id="regForm" class="p-8">
+
+            <!-- Error Message -->
+            <c:if test="${not empty error}">
+                <div class="mb-6 p-4 bg-red-50 border border-red-100 text-red-600 rounded-2xl flex items-center gap-3">
+                    <i data-lucide="alert-circle" class="w-5 h-5"></i>
+                    <span class="text-sm font-medium">${error}</span>
+                </div>
+            </c:if>
 
             <!-- Step 1: Account Credentials -->
             <div id="step-1" class="step-content active space-y-5">
@@ -54,11 +63,11 @@
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div class="space-y-1">
                         <label class="text-xs font-bold text-slate-500 uppercase">Username</label>
-                        <input type="text" name="username" required class="w-full px-4 py-3 rounded-xl bg-slate-50 border border-slate-200 focus:ring-2 focus:ring-blue-500 outline-none">
+                        <input type="text" name="username" value="${prevUsername}" required class="w-full px-4 py-3 rounded-xl bg-slate-50 border border-slate-200 focus:ring-2 focus:ring-blue-500 outline-none">
                     </div>
                     <div class="space-y-1">
                         <label class="text-xs font-bold text-slate-500 uppercase">Email Address</label>
-                        <input type="email" name="email" required class="w-full px-4 py-3 rounded-xl bg-slate-50 border border-slate-200 focus:ring-2 focus:ring-blue-500 outline-none">
+                        <input type="email" name="email" value="${prevEmail}" required class="w-full px-4 py-3 rounded-xl bg-slate-50 border border-slate-200 focus:ring-2 focus:ring-blue-500 outline-none">
                     </div>
                     <div class="space-y-1">
                         <label class="text-xs font-bold text-slate-500 uppercase">Password</label>
@@ -66,7 +75,7 @@
                     </div>
                     <div class="space-y-1">
                         <label class="text-xs font-bold text-slate-500 uppercase">Confirm Password</label>
-                        <input type="password" class="w-full px-4 py-3 rounded-xl bg-slate-50 border border-slate-200 focus:ring-2 focus:ring-blue-500 outline-none">
+                        <input type="password" name="confirmPassword" required class="w-full px-4 py-3 rounded-xl bg-slate-50 border border-slate-200 focus:ring-2 focus:ring-blue-500 outline-none">
                     </div>
                 </div>
             </div>
@@ -76,48 +85,13 @@
                 <h2 class="text-lg font-bold text-slate-800">Step 2: Identity Verification</h2>
                 <div class="space-y-4">
                     <div class="space-y-1">
-                        <label class="text-xs font-bold text-slate-500 uppercase">Full Name (As per Aadhaar)</label>
-                        <input type="text" name="fullName" class="w-full px-4 py-3 rounded-xl bg-slate-50 border border-slate-200 focus:ring-2 focus:ring-blue-500 outline-none">
-                    </div>
-                    <div class="space-y-1">
-                        <label class="text-xs font-bold text-slate-500 uppercase">Aadhaar Number (12 Digits)</label>
-                        <div class="relative">
-                            <input type="text" name="aadhaar" maxlength="12" placeholder="0000 0000 0000" class="w-full px-4 py-3 rounded-xl bg-slate-50 border border-slate-200 focus:ring-2 focus:ring-blue-500 outline-none font-mono">
-                            <button type="button" class="absolute right-3 top-2 text-xs bg-blue-100 text-blue-600 px-3 py-1.5 rounded-lg font-bold">Verify OTP</button>
-                        </div>
+                        <label class="text-xs font-bold text-slate-500 uppercase">Full Name</label>
+                        <input type="text" name="fullName" value="${prevFullName}" required class="w-full px-4 py-3 rounded-xl bg-slate-50 border border-slate-200 focus:ring-2 focus:ring-blue-500 outline-none">
                     </div>
                     <div class="space-y-1">
                         <label class="text-xs font-bold text-slate-500 uppercase">Phone Number</label>
-                        <input type="tel" name="phone" class="w-full px-4 py-3 rounded-xl bg-slate-50 border border-slate-200 focus:ring-2 focus:ring-blue-500 outline-none">
+                        <input type="tel" name="phone" value="${prevPhone}" required class="w-full px-4 py-3 rounded-xl bg-slate-50 border border-slate-200 focus:ring-2 focus:ring-blue-500 outline-none">
                     </div>
-                </div>
-            </div>
-
-            <!-- Step 3: Household Details -->
-            <div id="step-3" class="step-content space-y-5">
-                <h2 class="text-lg font-bold text-slate-800">Step 3: Household Category</h2>
-                <div class="grid grid-cols-1 gap-4">
-                    <label class="relative flex p-4 cursor-pointer rounded-2xl border border-slate-200 hover:bg-slate-50 transition-all has-[:checked]:border-blue-500 has-[:checked]:bg-blue-50">
-                        <input type="radio" name="category" value="BPL" class="mt-1 mr-3">
-                        <div>
-                            <span class="block font-bold text-slate-800">Below Poverty Line (BPL)</span>
-                            <span class="text-xs text-slate-500">Includes maximum subsidy for essential commodities.</span>
-                        </div>
-                    </label>
-                    <label class="relative flex p-4 cursor-pointer rounded-2xl border border-slate-200 hover:bg-slate-50 transition-all has-[:checked]:border-blue-500 has-[:checked]:bg-blue-50">
-                        <input type="radio" name="category" value="APL" class="mt-1 mr-3">
-                        <div>
-                            <span class="block font-bold text-slate-800">Above Poverty Line (APL)</span>
-                            <span class="text-xs text-slate-500">Includes standard market-rate subsidized goods.</span>
-                        </div>
-                    </label>
-                    <label class="relative flex p-4 cursor-pointer rounded-2xl border border-slate-200 hover:bg-slate-50 transition-all has-[:checked]:border-blue-500 has-[:checked]:bg-blue-50">
-                        <input type="radio" name="category" value="AAY" class="mt-1 mr-3">
-                        <div>
-                            <span class="block font-bold text-slate-800">Antyodaya Anna Yojana (AAY)</span>
-                            <span class="text-xs text-slate-500">For the poorest families with highly subsidized rates.</span>
-                        </div>
-                    </label>
                 </div>
                 <div class="flex items-center gap-2 pt-4">
                     <input type="checkbox" id="terms" required class="w-4 h-4 rounded">
@@ -131,7 +105,7 @@
                     <i data-lucide="arrow-left" class="w-4 h-4"></i> Previous
                 </button>
                 <div class="flex gap-3">
-                    <a href="index.html" class="px-6 py-3 text-slate-400 font-bold text-sm">Login</a>
+                    <a href="${pageContext.request.contextPath}/index.jsp" class="px-6 py-3 text-slate-400 font-bold text-sm">Cancel</a>
                     <button type="button" id="nextBtn" onclick="nextStep(1)" class="bg-blue-600 text-white px-8 py-3 rounded-xl font-bold text-sm shadow-lg shadow-blue-200 flex items-center gap-2">
                         Next <i data-lucide="arrow-right" class="w-4 h-4"></i>
                     </button>
@@ -143,42 +117,47 @@
     <script>
         lucide.createIcons();
         let currentStep = 1;
-        const totalSteps = 3;
+        const totalSteps = 2;
 
         function nextStep(n) {
             const steps = document.querySelectorAll('.step-content');
-            
- 
+
+            if (n > 0) {
+                const inputs = steps[currentStep-1].querySelectorAll('input[required]');
+                let valid = true;
+                inputs.forEach(input => {
+                    if (!input.value) {
+                        input.classList.add('border-red-500');
+                        valid = false;
+                    } else {
+                        input.classList.remove('border-red-500');
+                    }
+                });
+                if (!valid) return;
+            }
+
             steps[currentStep - 1].classList.remove('active');
-            
-
             currentStep += n;
-
 
             if (currentStep > totalSteps) {
                 document.getElementById('regForm').submit();
                 return;
             }
 
-
             steps[currentStep - 1].classList.add('active');
-
-
             updateUI();
         }
 
         function updateUI() {
-
             const progress = (currentStep / totalSteps) * 100;
             document.getElementById('progress').style.width = progress + '%';
 
-
             const prevBtn = document.getElementById('prevBtn');
-            prevBtn.style.visibility = currentStep === 1 ? 'hidden' : 'visible';
+            prevBtn.style.visibility = (currentStep === 1) ? 'hidden' : 'visible';
 
             const nextBtn = document.getElementById('nextBtn');
             if (currentStep === totalSteps) {
-                nextBtn.innerHTML = 'Submit Application <i data-lucide="check" class="w-4 h-4"></i>';
+                nextBtn.innerHTML = 'Register <i data-lucide="check" class="w-4 h-4"></i>';
                 nextBtn.classList.replace('bg-blue-600', 'bg-green-600');
             } else {
                 nextBtn.innerHTML = 'Next <i data-lucide="arrow-right" class="w-4 h-4"></i>';

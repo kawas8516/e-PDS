@@ -170,4 +170,33 @@ public class UserDAO {
             System.err.println("[UserDAO] updateLastLogin() SQL error: " + e.getMessage());
         }
     }
+
+    // ─────────────────────────────────────────────────────────────
+    //  registerUser()
+    //  Inserts a new citizen user into the database.
+    //  Returns true if insert succeeded, false otherwise.
+    // ─────────────────────────────────────────────────────────────
+    public boolean registerUser(String username, String hashedPassword,
+                                String fullName, String email, String mobile) {
+
+        String sql = "INSERT INTO users (username, password_hash, full_name, email, mobile, role, is_active) " +
+                     "VALUES (?, ?, ?, ?, ?, 'citizen', TRUE)";
+
+        try (Connection conn = DBConnection.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+
+            stmt.setString(1, username);
+            stmt.setString(2, hashedPassword);
+            stmt.setString(3, fullName);
+            stmt.setString(4, email);
+            stmt.setString(5, mobile);
+
+            return stmt.executeUpdate() > 0;
+
+        } catch (SQLException e) {
+            System.err.println("[UserDAO] registerUser() SQL error: " + e.getMessage());
+            e.printStackTrace();
+            return false;
+        }
+    }
 }
