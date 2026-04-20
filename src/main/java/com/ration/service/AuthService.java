@@ -39,9 +39,7 @@ public class AuthService {
     }
 
     public String getDashboardPath(User user) {
-        return validateUserRole(user, "admin")
-                ? "/WEB-INF/views/admin-dashboard.jsp"
-                : "/WEB-INF/views/citizen-dashboard.jsp";
+        return validateUserRole(user, "admin") ? "/admin-dashboard.html" : "/citizen-dashboard.html";
     }
 
     private boolean isBlank(String value) {
