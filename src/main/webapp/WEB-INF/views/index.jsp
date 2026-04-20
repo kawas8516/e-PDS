@@ -31,8 +31,10 @@
       </div>
 
       <div id="login-error" class="error-box mb-4 p-3 bg-red-50 border border-red-200 text-red-700 rounded-xl text-sm font-medium">${error}</div>
+      <div class="mb-4 p-3 bg-green-50 border border-green-200 text-green-700 rounded-xl text-sm font-medium">${success}</div>
 
       <form id="login-form" action="${pageContext.request.contextPath}/LoginServlet" method="post" class="space-y-5" novalidate>
+        <input type="hidden" name="csrfToken" value="${sessionScope.csrfToken}">
         <div>
           <label class="block text-sm font-semibold text-slate-700 mb-1">Aadhaar / Username</label>
           <div class="relative">
@@ -65,6 +67,9 @@
           </button>
         </div>
       </form>
+      <div class="mt-4 text-sm">
+        <a href="${pageContext.request.contextPath}/ResetPasswordServlet" class="text-blue-600">Forgot password?</a>
+      </div>
     </div>
   </div>
 

@@ -75,6 +75,8 @@ public class LoginServlet extends HttpServlet {
         // Create new session
         HttpSession session = request.getSession(true);
         session.setMaxInactiveInterval(SESSION_TIMEOUT_SECONDS);
+        session.setAttribute("user", user);
+        session.setAttribute("csrfToken", CSRFUtil.generateToken());
 
         // Store user info
         session.setAttribute("user", user);
@@ -102,6 +104,10 @@ public class LoginServlet extends HttpServlet {
         response.sendRedirect(request.getContextPath() +
                 "/index.html?error=" + encodedError +
                 "&lastUsername=" + encodedUsername);
+    }
+
+    private boolean isBlank(String value) {
+        return value == null || value.trim().isEmpty();
     }
 
     private boolean isBlank(String value) {
