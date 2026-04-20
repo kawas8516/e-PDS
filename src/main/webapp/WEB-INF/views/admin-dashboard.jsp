@@ -1,3 +1,4 @@
+<%@ page contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" %>
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -31,22 +32,22 @@
     </div>
 
     <nav class="flex-1 space-y-1">
-      <a href="admin-dashboard.html" class="sidebar-btn active w-full flex items-center gap-3 px-4 py-3 rounded-xl">
+      <a href="admin-dashboard.jsp" class="sidebar-btn active w-full flex items-center gap-3 px-4 py-3 rounded-xl">
         <i data-lucide="bar-chart-3" class="w-5 h-5"></i><span class="font-medium text-sm">System Stats</span>
       </a>
-      <a href="approvals.html" class="sidebar-btn w-full flex items-center gap-3 px-4 py-3 rounded-xl">
+      <a href="approvals.jsp" class="sidebar-btn w-full flex items-center gap-3 px-4 py-3 rounded-xl">
         <i data-lucide="clock" class="w-5 h-5"></i><span class="font-medium text-sm">New Applications</span>
       </a>
-      <a href="stock.html" class="sidebar-btn w-full flex items-center gap-3 px-4 py-3 rounded-xl">
+      <a href="stock.jsp" class="sidebar-btn w-full flex items-center gap-3 px-4 py-3 rounded-xl">
         <i data-lucide="package" class="w-5 h-5"></i><span class="font-medium text-sm">Stock Management</span>
       </a>
-      <a href="reports.html" class="sidebar-btn w-full flex items-center gap-3 px-4 py-3 rounded-xl">
+      <a href="reports.jsp" class="sidebar-btn w-full flex items-center gap-3 px-4 py-3 rounded-xl">
         <i data-lucide="file-text" class="w-5 h-5"></i><span class="font-medium text-sm">Reports</span>
       </a>
     </nav>
 
     <div class="mt-auto pt-6 border-t border-slate-800">
-      <a href="index.html" class="w-full flex items-center gap-3 px-4 py-3 text-slate-400 hover:text-red-400 hover:bg-red-400/10 rounded-xl transition-all">
+      <a href="${pageContext.request.contextPath}/index.jsp" class="w-full flex items-center gap-3 px-4 py-3 text-slate-400 hover:text-red-400 hover:bg-red-400/10 rounded-xl transition-all">
         <i data-lucide="log-out" class="w-5 h-5"></i><span class="font-medium text-sm">Logout</span>
       </a>
     </div>
@@ -127,7 +128,7 @@
       <div class="bg-white rounded-3xl p-8 shadow-sm border border-slate-200">
         <div class="flex justify-between items-center mb-7">
           <h3 class="text-base font-bold text-slate-800">Inventory Levels</h3>
-          <a href="stock.html" class="text-blue-600 text-sm font-bold hover:underline flex items-center gap-1">
+          <a href="stock.jsp" class="text-blue-600 text-sm font-bold hover:underline flex items-center gap-1">
             Manage <i data-lucide="arrow-right" class="w-4 h-4"></i>
           </a>
         </div>
@@ -175,7 +176,7 @@
       <div class="bg-white rounded-3xl p-8 shadow-sm border border-slate-200">
         <div class="flex justify-between items-center mb-7">
           <h3 class="text-base font-bold text-slate-800">Recent Applications</h3>
-          <a href="approvals.html" class="text-blue-600 text-sm font-bold hover:underline flex items-center gap-1">
+          <a href="approvals.jsp" class="text-blue-600 text-sm font-bold hover:underline flex items-center gap-1">
             View All <i data-lucide="arrow-right" class="w-4 h-4"></i>
           </a>
         </div>

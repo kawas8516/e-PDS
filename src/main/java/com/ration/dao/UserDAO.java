@@ -129,6 +129,28 @@ public class UserDAO {
         return null;
     }
 
+
+    public boolean updatePassword(String usernameOrEmail, String newHashedPassword) {
+
+        String sql = "UPDATE users SET password_hash = ? " +
+                     "WHERE LOWER(username) = LOWER(?) OR LOWER(email) = LOWER(?)";
+
+        try (Connection conn = DBConnection.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+
+            stmt.setString(1, newHashedPassword);
+            stmt.setString(2, usernameOrEmail.trim());
+            stmt.setString(3, usernameOrEmail.trim());
+
+            return stmt.executeUpdate() > 0;
+
+        } catch (SQLException e) {
+            System.err.println("[UserDAO] updatePassword() SQL error: " + e.getMessage());
+            e.printStackTrace();
+            return false;
+        }
+    }
+
     // ─────────────────────────────────────────────────────────────
     //  updateLastLogin()
     //  Records the timestamp of the last successful login
