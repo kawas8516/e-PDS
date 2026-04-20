@@ -1,3 +1,4 @@
+<%@ page contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" %>
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -31,22 +32,22 @@
     </div>
 
     <nav class="flex-1 space-y-1">
-      <a href="citizen-dashboard.html" class="sidebar-btn active w-full flex items-center gap-3 px-4 py-3 rounded-xl">
+      <a href="citizen-dashboard.jsp" class="sidebar-btn active w-full flex items-center gap-3 px-4 py-3 rounded-xl">
         <i data-lucide="layout-dashboard" class="w-5 h-5"></i><span class="font-medium text-sm">Dashboard</span>
       </a>
-      <a href="family.html" class="sidebar-btn w-full flex items-center gap-3 px-4 py-3 rounded-xl">
+      <a href="family.jsp" class="sidebar-btn w-full flex items-center gap-3 px-4 py-3 rounded-xl">
         <i data-lucide="users" class="w-5 h-5"></i><span class="font-medium text-sm">Family Members</span>
       </a>
-      <a href="allocation.html" class="sidebar-btn w-full flex items-center gap-3 px-4 py-3 rounded-xl">
+      <a href="allocation.jsp" class="sidebar-btn w-full flex items-center gap-3 px-4 py-3 rounded-xl">
         <i data-lucide="clipboard-list" class="w-5 h-5"></i><span class="font-medium text-sm">Monthly Quota</span>
       </a>
-      <a href="complaints.html" class="sidebar-btn w-full flex items-center gap-3 px-4 py-3 rounded-xl">
+      <a href="complaints.jsp" class="sidebar-btn w-full flex items-center gap-3 px-4 py-3 rounded-xl">
         <i data-lucide="alert-circle" class="w-5 h-5"></i><span class="font-medium text-sm">Complaints</span>
       </a>
     </nav>
 
     <div class="mt-auto pt-6 border-t border-slate-800">
-      <a href="index.html" class="w-full flex items-center gap-3 px-4 py-3 text-slate-400 hover:text-red-400 hover:bg-red-400/10 rounded-xl transition-all">
+      <a href="${pageContext.request.contextPath}/index.jsp" class="w-full flex items-center gap-3 px-4 py-3 text-slate-400 hover:text-red-400 hover:bg-red-400/10 rounded-xl transition-all">
         <i data-lucide="log-out" class="w-5 h-5"></i><span class="font-medium text-sm">Logout</span>
       </a>
     </div>
@@ -124,35 +125,35 @@
         <h3 class="text-base font-bold text-slate-800">Family Members</h3>
         <div class="text-6xl font-black text-slate-800 my-3">03</div>
         <p class="text-[10px] text-slate-400 uppercase font-bold tracking-widest">Verified Units</p>
-        <a href="family.html" class="mt-6 text-blue-600 text-sm font-bold hover:underline flex items-center gap-1">
+        <a href="family.jsp" class="mt-6 text-blue-600 text-sm font-bold hover:underline flex items-center gap-1">
           Manage Members <i data-lucide="arrow-right" class="w-4 h-4"></i>
         </a>
       </div>
 
       <!-- Quick Links -->
       <div class="md:col-span-3 grid grid-cols-2 md:grid-cols-4 gap-4">
-        <a href="allocation.html" class="bg-white rounded-2xl p-5 shadow-sm border border-slate-200 hover:border-blue-300 hover:shadow-md transition-all text-center group">
+        <a href="allocation.jsp" class="bg-white rounded-2xl p-5 shadow-sm border border-slate-200 hover:border-blue-300 hover:shadow-md transition-all text-center group">
           <div class="w-12 h-12 bg-amber-50 text-amber-600 rounded-xl flex items-center justify-center mx-auto mb-3 group-hover:bg-amber-100 transition-all">
             <i data-lucide="wheat" class="w-6 h-6"></i>
           </div>
           <p class="text-sm font-bold text-slate-700">Monthly Quota</p>
           <p class="text-xs text-slate-400 mt-0.5">View entitlement</p>
         </a>
-        <a href="family.html" class="bg-white rounded-2xl p-5 shadow-sm border border-slate-200 hover:border-blue-300 hover:shadow-md transition-all text-center group">
+        <a href="family.jsp" class="bg-white rounded-2xl p-5 shadow-sm border border-slate-200 hover:border-blue-300 hover:shadow-md transition-all text-center group">
           <div class="w-12 h-12 bg-blue-50 text-blue-600 rounded-xl flex items-center justify-center mx-auto mb-3 group-hover:bg-blue-100 transition-all">
             <i data-lucide="user-plus" class="w-6 h-6"></i>
           </div>
           <p class="text-sm font-bold text-slate-700">Add Member</p>
           <p class="text-xs text-slate-400 mt-0.5">Update family</p>
         </a>
-        <a href="complaints.html" class="bg-white rounded-2xl p-5 shadow-sm border border-slate-200 hover:border-blue-300 hover:shadow-md transition-all text-center group">
+        <a href="complaints.jsp" class="bg-white rounded-2xl p-5 shadow-sm border border-slate-200 hover:border-blue-300 hover:shadow-md transition-all text-center group">
           <div class="w-12 h-12 bg-red-50 text-red-500 rounded-xl flex items-center justify-center mx-auto mb-3 group-hover:bg-red-100 transition-all">
             <i data-lucide="message-square-warning" class="w-6 h-6"></i>
           </div>
           <p class="text-sm font-bold text-slate-700">Complaint</p>
           <p class="text-xs text-slate-400 mt-0.5">File a grievance</p>
         </a>
-        <a href="track-status.html" class="bg-white rounded-2xl p-5 shadow-sm border border-slate-200 hover:border-blue-300 hover:shadow-md transition-all text-center group">
+        <a href="track-status.jsp" class="bg-white rounded-2xl p-5 shadow-sm border border-slate-200 hover:border-blue-300 hover:shadow-md transition-all text-center group">
           <div class="w-12 h-12 bg-green-50 text-green-600 rounded-xl flex items-center justify-center mx-auto mb-3 group-hover:bg-green-100 transition-all">
             <i data-lucide="search" class="w-6 h-6"></i>
           </div>
@@ -165,7 +166,7 @@
       <div class="md:col-span-3 bg-white rounded-3xl p-8 shadow-sm border border-slate-200">
         <div class="flex justify-between items-center mb-6">
           <h3 class="text-base font-bold text-slate-800">Recent Ration Collection</h3>
-          <a href="allocation.html" class="text-blue-600 text-sm font-bold hover:underline">View All</a>
+          <a href="allocation.jsp" class="text-blue-600 text-sm font-bold hover:underline">View All</a>
         </div>
         <div class="overflow-x-auto">
           <table class="w-full text-left text-sm">
