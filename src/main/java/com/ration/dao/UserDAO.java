@@ -194,9 +194,11 @@ public class UserDAO {
             return stmt.executeUpdate() > 0;
 
         } catch (SQLException e) {
-            System.err.println("[UserDAO] registerUser() SQL error: " + e.getMessage());
+            System.err.println("[UserDAO] registerUser() FAILED — SQLState: " + e.getSQLState()
+                + " | Code: " + e.getErrorCode()
+                + " | Message: " + e.getMessage());
             e.printStackTrace();
-            return false;
+            throw new RuntimeException("DB insert failed: " + e.getMessage(), e);
         }
     }
 }

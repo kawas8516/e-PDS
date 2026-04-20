@@ -79,14 +79,19 @@ public class RegisterServlet extends HttpServlet {
         // --- Register ---
 
         String hashedPassword = PasswordUtil.hashPassword(password);
-        boolean success = userDAO.registerUser(username, hashedPassword, fullName, email, mobile);
-
-        if (success) {
-            // Forward to a success page that shows alert and redirects to login
-            request.setAttribute("successMessage", "Registration successful! You can now log in.");
-            request.getRequestDispatcher("/WEB-INF/views/register-success.jsp").forward(request, response);
-        } else {
-            forwardWithError(request, response, "Registration failed. Please try again.");
+        try {
+            boolean success = userDAO.registerUser(username, hashedPassword, fullName, email, mobile);
+            if (success) {
+                request.setAttribute("successMessage", "Registration successful! You can now log in.");
+                request.getRequestDispatcher("/WEB-INF/views/register-success.jsp").forward(request, response);
+            } else {
+                forwardWithError(request, response, "Registration failed. Please try again.");
+            }
+        } catch (RuntimeException e) {
+            // DB error — already fully logged in UserDAO; show a safe message to the user.
+            System.err.println("[RegisterServlet] Registration threw: " + e.getMessage());
+            forwardWithError(request, response,
+                "Registration failed due to a database error. Check the server console for details.");
         }
     }
 
