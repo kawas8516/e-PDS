@@ -1,5 +1,4 @@
 <%@ page contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" %>
-<%@ taglib prefix="c" uri="jakarta.tags.core" %>
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -32,9 +31,9 @@
       </div>
 
       <div id="login-error" class="error-box mb-4 p-3 bg-red-50 border border-red-200 text-red-700 rounded-xl text-sm font-medium">${error}</div>
-      <c:if test="${not empty success}">
-        <div class="mb-4 p-3 bg-green-50 border border-green-200 text-green-700 rounded-xl text-sm font-medium">${success}</div>
-      </c:if>
+      <% if (request.getAttribute("success") != null && !request.getAttribute("success").toString().isEmpty()) { %>
+      <div class="mb-4 p-3 bg-green-50 border border-green-200 text-green-700 rounded-xl text-sm font-medium">${success}</div>
+      <% } %>
 
       <form id="login-form" action="${pageContext.request.contextPath}/LoginServlet" method="post" class="space-y-5" novalidate>
         <input type="hidden" name="csrfToken" value="${sessionScope.csrfToken}">

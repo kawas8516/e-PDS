@@ -1,5 +1,4 @@
 <%@ page contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" %>
-<%@ taglib prefix="c" uri="jakarta.tags.core" %>
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -12,12 +11,12 @@
   <div class="w-full max-w-md bg-white rounded-2xl shadow p-8">
     <h1 class="text-xl font-bold text-slate-800 mb-6">Reset Password</h1>
 
-    <c:if test="${not empty error}">
+    <% if (request.getAttribute("error") != null && !request.getAttribute("error").toString().isEmpty()) { %>
       <div class="text-red-600 text-sm mb-3">${error}</div>
-    </c:if>
-    <c:if test="${not empty success}">
+    <% } %>
+    <% if (request.getAttribute("success") != null && !request.getAttribute("success").toString().isEmpty()) { %>
       <div class="text-green-600 text-sm mb-3">${success}</div>
-    </c:if>
+    <% } %>
 
     <form action="${pageContext.request.contextPath}/ResetPasswordServlet" method="post" class="space-y-4">
       <input type="hidden" name="csrfToken" value="${sessionScope.csrfToken}">

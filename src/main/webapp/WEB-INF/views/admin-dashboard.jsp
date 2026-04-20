@@ -1,8 +1,11 @@
 <%@ page contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" %>
-<%@ taglib prefix="c" uri="jakarta.tags.core" %>
-<c:if test="${empty sessionScope.user or not sessionScope.user.admin}">
-    <c:redirect url="/index.jsp" />
-</c:if>
+<%
+    com.ration.model.User __u = (com.ration.model.User) session.getAttribute("user");
+    if (__u == null || !__u.isAdmin()) {
+        response.sendRedirect(request.getContextPath() + "/index.jsp");
+        return;
+    }
+%>
 <!DOCTYPE html>
 <html lang="en">
 <head>

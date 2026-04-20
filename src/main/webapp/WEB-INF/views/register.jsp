@@ -1,5 +1,4 @@
 <%@ page contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" %>
-<%@ taglib prefix="c" uri="jakarta.tags.core" %>
 
 <!DOCTYPE html>
 <html lang="en">
@@ -50,12 +49,12 @@
         <form action="${pageContext.request.contextPath}/RegisterServlet" method="POST" id="regForm" class="p-8">
 
             <!-- Error Message -->
-            <c:if test="${not empty error}">
-                <div class="mb-6 p-4 bg-red-50 border border-red-100 text-red-600 rounded-2xl flex items-center gap-3">
-                    <i data-lucide="alert-circle" class="w-5 h-5"></i>
-                    <span class="text-sm font-medium">${error}</span>
-                </div>
-            </c:if>
+            <% if (request.getAttribute("error") != null && !request.getAttribute("error").toString().isEmpty()) { %>
+            <div class="mb-6 p-4 bg-red-50 border border-red-100 text-red-600 rounded-2xl flex items-center gap-3">
+                <i data-lucide="alert-circle" class="w-5 h-5"></i>
+                <span class="text-sm font-medium">${error}</span>
+            </div>
+            <% } %>
 
             <!-- Step 1: Account Credentials -->
             <div id="step-1" class="step-content active space-y-5">
