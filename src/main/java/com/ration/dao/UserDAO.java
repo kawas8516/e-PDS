@@ -130,6 +130,44 @@ public class UserDAO {
     }
 
 
+    // ─────────────────────────────────────────────────────────────
+    //  findByIdentifier()
+    //  Looks up a user by username OR email (used by ResetPasswordServlet
+    //  to resolve the real userId before writing the audit log entry).
+    // ─────────────────────────────────────────────────────────────
+    public User findByIdentifier(String usernameOrEmail) {
+        String sql = "SELECT user_id, username, full_name, email, mobile, role, is_active " +
+                     "FROM   users " +
+                     "WHERE  LOWER(username) = LOWER(?) OR LOWER(email) = LOWER(?)";
+
+        try (Connection conn = DBConnection.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+
+            stmt.setString(1, usernameOrEmail.trim());
+            stmt.setString(2, usernameOrEmail.trim());
+
+            try (ResultSet rs = stmt.executeQuery()) {
+                if (rs.next()) {
+                    User user = new User();
+                    user.setUserId(rs.getInt("user_id"));
+                    user.setUsername(rs.getString("username"));
+                    user.setFullName(rs.getString("full_name"));
+                    user.setEmail(rs.getString("email"));
+                    user.setMobile(rs.getString("mobile"));
+                    user.setRole(rs.getString("role"));
+                    user.setActive(rs.getBoolean("is_active"));
+                    return user;
+                }
+            }
+
+        } catch (SQLException e) {
+            System.err.println("[UserDAO] findByIdentifier() SQL error: " + e.getMessage());
+            e.printStackTrace();
+        }
+
+        return null;
+    }
+
     public boolean updatePassword(String usernameOrEmail, String newHashedPassword) {
 
         String sql = "UPDATE users SET password_hash = ? " +
@@ -179,8 +217,9 @@ public class UserDAO {
     public boolean registerUser(String username, String hashedPassword,
                                 String fullName, String email, String mobile) {
 
+        // Role stored as uppercase to match RBAC checks in AuthFilter and AuthService.
         String sql = "INSERT INTO users (username, password_hash, full_name, email, mobile, role, is_active) " +
-                     "VALUES (?, ?, ?, ?, ?, 'citizen', TRUE)";
+                     "VALUES (?, ?, ?, ?, ?, 'CITIZEN', TRUE)";
 
         try (Connection conn = DBConnection.getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql)) {

@@ -39,7 +39,8 @@ public class AuthService {
     }
 
     public String getDashboardPath(User user) {
-        return validateUserRole(user, "admin") ? "/admin-dashboard.jsp" : "/citizen-dashboard.jsp";
+        // Roles are stored as uppercase (ADMIN / CITIZEN) — equalsIgnoreCase handles legacy data.
+        return validateUserRole(user, "ADMIN") ? "/admin-dashboard.jsp" : "/citizen-dashboard.jsp";
     }
 
     private boolean isBlank(String value) {

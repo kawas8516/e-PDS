@@ -1,145 +1,148 @@
-# 📘 Digital Ration Card Management System
+# Digital Ration Card Management System (e-PDS)
+
 [![Ask DeepWiki](https://deepwiki.com/badge.svg)](https://deepwiki.com/kawas8516/e-PDS)
-## 📌 Project Overview
 
-The **Digital Ration Card Management System** is a Java-based desktop application designed to automate and digitize the ration card management process. It replaces the traditional manual system with a secure, efficient, and transparent digital solution accessible to both **citizens** and **administrators**.
-
-The system manages ration card applications, family details, stock allocation, monthly distribution, and complaint handling through a centralized database.
+A Jakarta EE web application for managing digital ration card operations. Citizens can register and view their ration profile; administrators manage stock, applications, allocations, and complaints. Deployed on Apache Tomcat 10.1 with a PostgreSQL backend.
 
 ---
 
-## 🎯 Objectives
+## Technology Stack
 
-- To digitize the ration card application process
-- To maintain accurate citizen and family records
-- To manage ration stock and monthly allocations efficiently
-- To ensure transparency in ration distribution
-- To provide a user-friendly system for both citizens and administrators
-
----
-
-## 👥 User Roles
-
-### 1. Citizen
-
-- Register and log in
-- Apply for a ration card
-- Manage family member details
-- Track application status
-- View monthly ration allocation
-- Submit complaints or feedback
-
-### 2. Administrator
-
-- Approve or reject ration card applications
-- Manage ration stock
-- Allocate monthly rations
-- Record distribution details
-- View complaints and reports
-- Generate analytics and summaries
+| Component | Technology |
+|-----------|-----------|
+| Runtime | Java 21 |
+| Servlet container | Apache Tomcat 10.1 |
+| API namespace | Jakarta EE 6 (`jakarta.*`) |
+| Database | PostgreSQL (JDBC via `postgresql-42.7.4.jar`) |
+| Password hashing | jBCrypt (`jbcrypt-0.4.jar`) |
+| Build system | None — manual JARs in `WEB-INF/lib` |
+| IDE | Eclipse (Dynamic Web Project / WTP) |
 
 ---
 
-## 🧩 Key Modules
+## Architecture
 
-1. Login & Authentication
-2. Citizen Registration
-3. Family Member Management
-4. Ration Card Application
-5. Application Status Tracking
-6. Stock Management (Admin)
-7. Monthly Allocation
-8. Distribution Entry
-9. Complaint / Feedback
-10. Reports & Analytics
+The project follows a strict three-layer pattern inside a single WAR:
 
----
+```
+Request
+  └─ AuthFilter              (authentication + RBAC gate)
+       └─ Servlet (controller)
+            └─ Service        (business logic)
+                 └─ DAO       (SQL via PreparedStatement)
+                      └─ PostgreSQL
+```
 
-## 🏗 System Architecture
+Views are JSP files stored exclusively under `WEB-INF/views/` and are never accessible by direct URL. All view rendering goes through a servlet.
 
-The project follows a **layered architecture**:
+### Package layout
 
-- **Presentation Layer:** Java Swing UI
-- **Business Logic Layer:** Service classes handling validations and workflows
-- **Data Access Layer:** JDBC with DAO pattern
-- **Database Layer:** MySQL / SQLite
-
-This structure ensures modularity, maintainability, and scalability.
-
----
-
-## 🛠 Technology Stack
-
-- **Programming Language:** Java
-- **UI Framework:** Java Swing
-- **Backend:** Core Java, JDBC
-- **Database:** MySQL / SQLite
-- **IDE:** NetBeans / IntelliJ IDEA
+```
+com.ration.controller   LoginServlet, RegisterServlet, ResetPasswordServlet, LogoutServlet
+com.ration.service      AuthService
+com.ration.dao          UserDAO, TransactionDAO
+com.ration.model        User, Stock
+com.ration.filter       AuthFilter
+com.ration.util         DBConnection, CSRFUtil, AuditUtil, PasswordUtil
+```
 
 ---
 
-## 🗄 Database Tables (Overview)
+## User Roles
 
-- Users
-- Citizens
-- FamilyMembers
-- RationCards
-- Stock
-- MonthlyAllocation
-- Distribution
-- Complaints
+### Citizen (`CITIZEN`)
+- Register for an account
+- Log in and view their ration card profile
+- View family members, monthly quota, and collection history
+- Submit complaints
 
-Each table is properly normalized with primary and foreign key relationships.
-
----
-
-## 🔐 Security Features
-
-- Role-based login system
-- Input validation
-- SQL Injection prevention using PreparedStatement
-- Controlled access to admin functionalities
+### Administrator (`ADMIN`)
+- View system statistics and inventory levels
+- Review and action new card applications
+- Manage stock
+- View reports and open complaints
 
 ---
 
-## 🧪 Testing
+## Security
 
-- Manual testing for all modules
-- Validation testing with valid and invalid inputs
-- Database integrity testing
-- Screenshot evidence included in documentation
-
----
-
-## 📈 Reports Generated
-
-- Monthly stock report
-- Ration distribution report
-- Citizen-wise allocation report
-- Complaint status report
+- **Authentication:** BCrypt password verification; sessions expire after 30 minutes of inactivity
+- **Session fixation:** `request.changeSessionId()` rotates the session ID on successful login
+- **CSRF protection:** UUID token seeded on every form GET, validated on every POST; regenerated after each failed attempt
+- **RBAC:** `AuthFilter` enforces role checks on every request (REQUEST dispatch only); admin and citizen pages are gated to their respective roles
+- **Logout:** POST-only; GET returns 405 to prevent cross-site logout
+- **Password reset:** Requires the current password before accepting a new one
+- **Cookies:** `HttpOnly` and `Secure` flags set in `web.xml`; `SameSite=Strict` requires a Tomcat `context.xml` setting (see Deployment below)
+- **SQL injection:** All queries use `PreparedStatement` with bound parameters
+- **Audit log:** Login success, login failure, and password reset events are written to the `audit_logs` table
 
 ---
 
-## 🚀 Future Enhancements
+## Database Tables
 
-- Web-based version using Spring Boot
-- Password encryption and hashing
-- OTP-based login
-- Aadhaar integration
-- Report export (PDF / Excel)
-- Mobile application support
-
----
-
-## 📚 Conclusion
-
-The **Digital Ration Card Management System** provides an effective solution to manage ration distribution digitally. It improves efficiency, reduces manual errors, and ensures transparency, making it suitable for real-world government applications as well as academic learning.
+| Table | Purpose |
+|-------|---------|
+| `users` | Account credentials, role (`ADMIN`/`CITIZEN`), active flag, last login |
+| `audit_logs` | Per-event log of `user_id`, action, timestamp, IP address |
+| `stock_inventory` | Item stock levels; decremented atomically on ration issuance |
+| `transactions` | Ration issuance records (card, item, quantity, amount, date) |
 
 ---
 
-## 📖 References
+## Project Structure
 
-- Java Documentation
-- JDBC API Documentation
-- MySQL / SQLite Documentation
-- Software Engineering Concepts
+```
+src/main/
+  java/com/ration/          Java source files (see package layout above)
+  webapp/
+    WEB-INF/
+      lib/                  Third-party JARs (postgresql, jbcrypt, jstl-api)
+      views/                JSP views (never served directly)
+        index.jsp           Login form
+        register.jsp        Registration form
+        reset-password.jsp  Password reset form
+        register-success.jsp
+        admin-dashboard.jsp
+        citizen-dashboard.jsp
+        error.jsp           Shared error page (403 / 404 / 500)
+      web.xml
+    *.html                  Static admin/citizen sub-pages (RBAC-gated by AuthFilter)
+    index.jsp               Root redirect → /LoginServlet
+```
+
+---
+
+## Deployment
+
+### Prerequisites
+
+- JDK 21
+- Apache Tomcat 10.1
+- PostgreSQL with the schema applied
+
+### Database configuration
+
+Connection parameters are read from `src/main/webapp/WEB-INF/classes/db.properties`. The database password can be overridden at runtime via the `DB_PASSWORD` environment variable so that credentials are never committed to source control.
+
+### SameSite cookie
+
+Add the following to Tomcat's `conf/context.xml` to enable `SameSite=Strict` on the session cookie (this cannot be set inside `web.xml`):
+
+```xml
+<CookieProcessor sameSiteCookies="strict" />
+```
+
+### Eclipse / WTP
+
+1. Import the project as an existing Eclipse project.
+2. Add Tomcat 10.1 as a targeted runtime (Project Properties > Targeted Runtimes).
+3. Verify the JARs in `WEB-INF/lib` — do **not** add `servlet-api.jar` or `jsp-api.jar`; those are provided by Tomcat.
+4. Deploy to the configured Tomcat server and start.
+
+---
+
+## Known Limitations and Planned Improvements
+
+- **Password reset** currently requires the user's existing password, not an email token. A proper email-token reset flow (with a `password_reset_tokens` table and email gateway) is the intended long-term replacement.
+- **JSTL conditionals** in JSPs use scriptlets because only the JSTL API JAR is bundled. Adding the JSTL implementation JAR would allow migration to `<c:if>` expressions.
+- **Static sub-pages** (`stock.html`, `approvals.html`, etc.) contain placeholder UI only. Full backend wiring for those modules is pending.

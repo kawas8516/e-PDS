@@ -2,6 +2,7 @@ package com.ration.controller;
 
 import java.io.IOException;
 import com.ration.dao.UserDAO;
+import com.ration.model.User;
 import com.ration.util.AuditUtil;
 import com.ration.util.CSRFUtil;
 import com.ration.util.PasswordUtil;
@@ -36,7 +37,8 @@ public class ResetPasswordServlet extends HttpServlet {
             session.setAttribute("csrfToken", CSRFUtil.generateToken());
         }
 
-        request.getRequestDispatcher("/reset-password.jsp").forward(request, response);
+        // Forward directly to view — avoids the root reset-password.jsp forward loop.
+        request.getRequestDispatcher("/WEB-INF/views/reset-password.jsp").forward(request, response);
     }
 
     @Override
@@ -53,6 +55,11 @@ public class ResetPasswordServlet extends HttpServlet {
         }
 
         String identifier = trim(request.getParameter("identifier"));
+        // Security: require the current (known) password before accepting a new one.
+        // This prevents the unauthenticated account-takeover path: an attacker who
+        // knows only a username or email cannot set a new password without the existing one.
+        // A full email-token reset flow is the proper long-term fix (out of scope here).
+        String currentPassword = request.getParameter("currentPassword");
         String newPassword = trim(request.getParameter("newPassword"));
         String confirmPassword = trim(request.getParameter("confirmPassword"));
 
@@ -61,8 +68,13 @@ public class ResetPasswordServlet extends HttpServlet {
             return;
         }
 
+        if (isBlank(currentPassword)) {
+            forwardWithError(request, response, "Current password is required.", identifier);
+            return;
+        }
+
         if (isBlank(newPassword) || newPassword.length() < MIN_PASSWORD_LENGTH) {
-            forwardWithError(request, response, "Password must be at least 6 characters.", identifier);
+            forwardWithError(request, response, "New password must be at least 6 characters.", identifier);
             return;
         }
 
@@ -71,18 +83,34 @@ public class ResetPasswordServlet extends HttpServlet {
             return;
         }
 
-        String hashedPassword = PasswordUtil.hashPassword(newPassword);
-        boolean updated = userDAO.updatePassword(identifier, hashedPassword);
-
-        if (!updated) {
+        // Look up the user to verify identity and get the real userId for audit.
+        User user = userDAO.findByIdentifier(identifier);
+        if (user == null) {
             forwardWithError(request, response, "User not found.", identifier);
             return;
         }
 
-        AuditUtil.logAction(0, "PASSWORD_RESET", request.getRemoteAddr());
+        // Verify the current password against the stored hash before allowing reset.
+        User verified = userDAO.authenticate(user.getUsername(), currentPassword);
+        if (verified == null) {
+            forwardWithError(request, response, "Current password is incorrect.", identifier);
+            return;
+        }
+
+        String hashedPassword = PasswordUtil.hashPassword(newPassword);
+        boolean updated = userDAO.updatePassword(identifier, hashedPassword);
+
+        if (!updated) {
+            forwardWithError(request, response, "Password update failed. Please try again.", identifier);
+            return;
+        }
+
+        // Audit with the real userId now that the user is resolved.
+        AuditUtil.logAction(user.getUserId(), "PASSWORD_RESET", request.getRemoteAddr());
 
         request.setAttribute("success", "Password reset successful. Please log in.");
-        request.getRequestDispatcher("/index.jsp").forward(request, response);
+        // Forward directly to view — root index.jsp triggers an AuthFilter redirect loop.
+        request.getRequestDispatcher("/WEB-INF/views/index.jsp").forward(request, response);
     }
 
     private void forwardWithError(HttpServletRequest request,
@@ -91,9 +119,13 @@ public class ResetPasswordServlet extends HttpServlet {
                                   String identifier)
             throws ServletException, IOException {
 
+        // Regenerate CSRF token for the retry form.
+        HttpSession session = request.getSession(true);
+        session.setAttribute("csrfToken", CSRFUtil.generateToken());
+
         request.setAttribute("error", error);
         request.setAttribute("identifier", identifier == null ? "" : identifier);
-        request.getRequestDispatcher("/reset-password.jsp").forward(request, response);
+        request.getRequestDispatcher("/WEB-INF/views/reset-password.jsp").forward(request, response);
     }
 
     private String trim(String value) {

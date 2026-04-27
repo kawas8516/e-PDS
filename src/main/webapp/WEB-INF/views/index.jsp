@@ -73,6 +73,7 @@
         <a href="${pageContext.request.contextPath}/ResetPasswordServlet" class="text-blue-600 hover:underline">Forgot password?</a>
         <a href="${pageContext.request.contextPath}/RegisterServlet" class="text-slate-500 hover:text-blue-600 font-medium">New user? Register</a>
       </div>
+      <%-- Note: this view is served only via LoginServlet GET — never via the root index.jsp forward. --%>
     </div>
   </div>
 

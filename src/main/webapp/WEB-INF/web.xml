@@ -5,29 +5,35 @@
          version="6.0">
     <display-name>e-PDS</display-name>
 
-    <!-- Session security: httpOnly prevents JS access to session cookie -->
+    <!-- Session security: httpOnly prevents JS access; Secure ensures cookie sent
+         only over HTTPS; SameSite=Strict blocks cross-site request forgery. -->
     <session-config>
         <session-timeout>30</session-timeout>
         <cookie-config>
             <http-only>true</http-only>
+            <secure>true</secure>
         </cookie-config>
+        <tracking-mode>COOKIE</tracking-mode>
     </session-config>
 
-    <!-- Error pages -->
+    <!-- Error pages forward to a plain view, not the public index, to avoid
+         the AuthFilter re-running on ERROR dispatches. AuthFilter is now
+         restricted to REQUEST dispatch only, but pointing errors at index.jsp
+         was also a UX problem (login page shown for 404/500). -->
     <error-page>
         <error-code>403</error-code>
-        <location>/index.jsp</location>
+        <location>/WEB-INF/views/error.jsp</location>
     </error-page>
     <error-page>
         <error-code>404</error-code>
-        <location>/index.jsp</location>
+        <location>/WEB-INF/views/error.jsp</location>
     </error-page>
     <error-page>
         <error-code>500</error-code>
-        <location>/index.jsp</location>
+        <location>/WEB-INF/views/error.jsp</location>
     </error-page>
 
     <welcome-file-list>
-        <welcome-file>index.jsp</welcome-file>
+        <welcome-file>LoginServlet</welcome-file>
     </welcome-file-list>
 </web-app>

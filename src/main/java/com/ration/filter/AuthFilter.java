@@ -1,6 +1,7 @@
 package com.ration.filter;
 
 import com.ration.model.User;
+import jakarta.servlet.DispatcherType;
 import jakarta.servlet.Filter;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.FilterConfig;
@@ -13,8 +14,9 @@ import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
 import java.io.IOException;
 
-
-@WebFilter("/*")
+// DispatcherType.REQUEST only: prevents AuthFilter running on ERROR/FORWARD dispatches,
+// which broke the error-page flow by re-running auth checks and creating redirect loops.
+@WebFilter(urlPatterns = "/*", dispatcherTypes = {DispatcherType.REQUEST})
 public class AuthFilter implements Filter {
 
     @Override
@@ -37,12 +39,12 @@ public class AuthFilter implements Filter {
 
         boolean isPublic = isPublicPath(path);
         if (user == null && !isPublic) {
-            res.sendRedirect(contextPath + "/index.jsp");
+            res.sendRedirect(contextPath + "/LoginServlet");
             return;
         }
 
         if (user != null && isUnauthorizedRoleAccess(path, user)) {
-            res.sendRedirect(contextPath + "/index.jsp?error=unauthorized");
+            res.sendError(HttpServletResponse.SC_FORBIDDEN, "Access denied");
             return;
         }
 
@@ -54,28 +56,58 @@ public class AuthFilter implements Filter {
     }
 
     private boolean isPublicPath(String path) {
+        // Explicit allow-list — anything not listed here requires authentication.
         return "/".equals(path)
-                || "/index.jsp".equals(path)
                 || "/LoginServlet".equals(path)
-                || "/register.jsp".equals(path)
                 || "/RegisterServlet".equals(path)
-                || "/reset-password.jsp".equals(path)
                 || "/ResetPasswordServlet".equals(path)
                 || path.startsWith("/css/")
                 || path.startsWith("/js/")
                 || path.startsWith("/images/")
                 || path.startsWith("/assets/")
-                || path.startsWith("/favicon")
-                || path.startsWith("/LogoutServlet");
+                || path.startsWith("/favicon");
     }
 
     private boolean isUnauthorizedRoleAccess(String path, User user) {
         String role = user.getRole() == null ? "" : user.getRole().trim().toUpperCase();
 
-        if (path.contains("/admin") && !"ADMIN".equals(role)) {
+        // Use startsWith prefix checks — contains("/admin") would falsely match paths
+        // like "/administrator" or a query string containing the word admin.
+        if ((path.startsWith("/admin-dashboard.jsp") || path.startsWith("/admin/"))
+                && !"ADMIN".equals(role)) {
             return true;
         }
 
-        return path.contains("/citizen") && !"CITIZEN".equals(role);
+        // Static admin-only HTML pages — require ADMIN role
+        if (isAdminOnlyStaticPage(path) && !"ADMIN".equals(role)) {
+            return true;
+        }
+
+        // Citizen-specific paths
+        if ((path.startsWith("/citizen-dashboard.jsp") || path.startsWith("/citizen/"))
+                && !"CITIZEN".equals(role)) {
+            return true;
+        }
+
+        // Citizen-only static pages
+        if (isCitizenOnlyStaticPage(path) && !"CITIZEN".equals(role)) {
+            return true;
+        }
+
+        return false;
+    }
+
+    /** Static HTML pages that are admin-only. */
+    private boolean isAdminOnlyStaticPage(String path) {
+        return "/stock.html".equals(path)
+                || "/approvals.html".equals(path)
+                || "/reports.html".equals(path);
+    }
+
+    /** Static HTML pages that are citizen-only. */
+    private boolean isCitizenOnlyStaticPage(String path) {
+        return "/family.html".equals(path)
+                || "/complaints.html".equals(path)
+                || "/allocation.html".equals(path);
     }
 }

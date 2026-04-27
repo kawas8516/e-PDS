@@ -47,6 +47,7 @@
 
         <!-- Registration Form -->
         <form action="${pageContext.request.contextPath}/RegisterServlet" method="POST" id="regForm" class="p-8">
+            <input type="hidden" name="csrfToken" value="${sessionScope.csrfToken}">
 
             <!-- Error Message -->
             <% if (request.getAttribute("error") != null && !request.getAttribute("error").toString().isEmpty()) { %>
@@ -104,7 +105,7 @@
                     <i data-lucide="arrow-left" class="w-4 h-4"></i> Previous
                 </button>
                 <div class="flex gap-3">
-                    <a href="${pageContext.request.contextPath}/index.jsp" class="px-6 py-3 text-slate-400 font-bold text-sm">Cancel</a>
+                    <a href="${pageContext.request.contextPath}/LoginServlet" class="px-6 py-3 text-slate-400 font-bold text-sm">Cancel</a>
                     <button type="button" id="nextBtn" onclick="nextStep(1)" class="bg-blue-600 text-white px-8 py-3 rounded-xl font-bold text-sm shadow-lg shadow-blue-200 flex items-center gap-2">
                         Next <i data-lucide="arrow-right" class="w-4 h-4"></i>
                     </button>

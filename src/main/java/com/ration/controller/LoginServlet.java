@@ -2,6 +2,7 @@ package com.ration.controller;
 
 import com.ration.model.User;
 import com.ration.service.AuthService;
+import com.ration.util.AuditUtil;
 import com.ration.util.CSRFUtil;
 
 import jakarta.servlet.ServletException;
@@ -32,18 +33,37 @@ public class LoginServlet extends HttpServlet {
 
         HttpSession existingSession = request.getSession(false);
 
+        // Already authenticated — bounce to the appropriate dashboard.
         if (existingSession != null && existingSession.getAttribute("user") != null) {
             User user = (User) existingSession.getAttribute("user");
             response.sendRedirect(request.getContextPath() + authService.getDashboardPath(user));
             return;
         }
 
-        response.sendRedirect(request.getContextPath() + "/index.jsp");
+        // Seed the CSRF token before the login form is rendered so the hidden
+        // input has a value on the very first GET (fix for empty-token bug).
+        HttpSession session = request.getSession(true);
+        if (session.getAttribute("csrfToken") == null) {
+            session.setAttribute("csrfToken", CSRFUtil.generateToken());
+        }
+
+        // Forward directly to the view — avoids the root index.jsp → AuthFilter loop.
+        request.getRequestDispatcher("/WEB-INF/views/index.jsp").forward(request, response);
     }
 
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
+
+        // CSRF validation — must occur before any processing.
+        HttpSession session = request.getSession(false);
+        String sessionToken = (session != null) ? (String) session.getAttribute("csrfToken") : null;
+        String requestToken = request.getParameter("csrfToken");
+
+        if (!CSRFUtil.validateToken(sessionToken, requestToken)) {
+            response.sendError(HttpServletResponse.SC_FORBIDDEN, "Invalid CSRF token");
+            return;
+        }
 
         String username = request.getParameter("username");
         String password = request.getParameter("password");
@@ -61,29 +81,30 @@ public class LoginServlet extends HttpServlet {
         User user = authService.authenticate(username, password);
 
         if (user == null) {
+            // Audit failed login attempt — userId 0 is acceptable here since user is not resolved.
+            AuditUtil.logAction(0, "LOGIN_FAIL", request.getRemoteAddr());
             forwardWithError(request, response, "Invalid username or password.", username);
             return;
         }
 
-        // Invalidate old session
-        HttpSession oldSession = request.getSession(false);
-        if (oldSession != null) {
-            oldSession.invalidate();
-        }
+        // Session-fixation prevention: changeSessionId() preserves attributes while
+        // issuing a new session ID, so the attacker's pre-auth session ID is invalidated.
+        request.changeSessionId();
 
-        // Create new session
-        HttpSession session = request.getSession(true);
-        session.setMaxInactiveInterval(SESSION_TIMEOUT_SECONDS);
-        session.setAttribute("csrfToken", CSRFUtil.generateToken());
+        HttpSession newSession = request.getSession(true);
+        newSession.setMaxInactiveInterval(SESSION_TIMEOUT_SECONDS);
+        newSession.setAttribute("csrfToken", CSRFUtil.generateToken());
 
-        // Store user info
-        session.setAttribute("user", user);
-        session.setAttribute("userId", user.getUserId());
-        session.setAttribute("username", user.getUsername());
-        session.setAttribute("fullName", user.getFullName());
-        session.setAttribute("role", user.getRole());
+        // Store user info in session.
+        newSession.setAttribute("user", user);
+        newSession.setAttribute("userId", user.getUserId());
+        newSession.setAttribute("username", user.getUsername());
+        newSession.setAttribute("fullName", user.getFullName());
+        newSession.setAttribute("role", user.getRole());
 
-        // Redirect to dashboard
+        // Audit successful login.
+        AuditUtil.logAction(user.getUserId(), "LOGIN_SUCCESS", request.getRemoteAddr());
+
         response.sendRedirect(request.getContextPath() + authService.getDashboardPath(user));
     }
 
@@ -93,9 +114,14 @@ public class LoginServlet extends HttpServlet {
                                   String username)
             throws ServletException, IOException {
 
+        // Regenerate CSRF token so retry form has a valid token.
+        HttpSession session = request.getSession(true);
+        session.setAttribute("csrfToken", CSRFUtil.generateToken());
+
         request.setAttribute("error", errorMessage);
         request.setAttribute("lastUsername", username == null ? "" : username.trim());
-        request.getRequestDispatcher("/index.jsp").forward(request, response);
+        // Forward directly to view — root index.jsp re-forwards here and triggers AuthFilter.
+        request.getRequestDispatcher("/WEB-INF/views/index.jsp").forward(request, response);
     }
 
     private boolean isBlank(String value) {

@@ -53,9 +53,13 @@
     </nav>
 
     <div class="mt-auto pt-6 border-t border-slate-800">
-      <a href="${pageContext.request.contextPath}/LogoutServlet" class="w-full flex items-center gap-3 px-4 py-3 text-slate-400 hover:text-red-400 hover:bg-red-400/10 rounded-xl transition-all">
-        <i data-lucide="log-out" class="w-5 h-5"></i><span class="font-medium text-sm">Logout</span>
-      </a>
+      <!-- Logout must be POST to prevent CSRF logout (GET logout was disabled). -->
+      <form method="post" action="${pageContext.request.contextPath}/LogoutServlet" id="logoutForm">
+        <input type="hidden" name="csrfToken" value="${sessionScope.csrfToken}">
+        <button type="submit" class="w-full flex items-center gap-3 px-4 py-3 text-slate-400 hover:text-red-400 hover:bg-red-400/10 rounded-xl transition-all">
+          <i data-lucide="log-out" class="w-5 h-5"></i><span class="font-medium text-sm">Logout</span>
+        </button>
+      </form>
     </div>
   </aside>
 
