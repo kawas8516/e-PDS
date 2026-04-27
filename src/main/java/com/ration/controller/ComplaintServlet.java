@@ -1,6 +1,6 @@
 package com.ration.controller;
 
-import com.ration.dao.ComplaintDAO;
+import com.ration.util.DBConnection;
 
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
@@ -10,18 +10,14 @@ import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
 
 import java.io.IOException;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.SQLException;
 
 @WebServlet("/ComplaintServlet")
 public class ComplaintServlet extends HttpServlet {
 
     private static final long serialVersionUID = 1L;
-
-    private ComplaintDAO complaintDAO;
-
-    @Override
-    public void init() throws ServletException {
-        complaintDAO = new ComplaintDAO();
-    }
 
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
@@ -48,13 +44,31 @@ public class ComplaintServlet extends HttpServlet {
             return;
         }
 
-        boolean saved = complaintDAO.createComplaint(userId, complaintType, month, description);
+        boolean saved = saveComplaint(userId, complaintType, month, description);
         if (!saved) {
             response.sendRedirect(request.getContextPath() + "/complaints.html?error=db_insert_failed");
             return;
         }
 
         response.sendRedirect(request.getContextPath() + "/complaints.html?success=1");
+    }
+
+    private boolean saveComplaint(int userId, String complaintType, String month, String description) {
+        String sql = "INSERT INTO complaints (user_id, type, month, description, status) VALUES (?, ?, ?, ?, 'OPEN')";
+
+        try (Connection connection = DBConnection.getConnection();
+             PreparedStatement statement = connection.prepareStatement(sql)) {
+
+            statement.setInt(1, userId);
+            statement.setString(2, complaintType);
+            statement.setString(3, month);
+            statement.setString(4, description);
+            return statement.executeUpdate() > 0;
+
+        } catch (SQLException e) {
+            System.err.println("[ComplaintServlet] saveComplaint failed: " + e.getMessage());
+            return false;
+        }
     }
 
     private Integer getLoggedInUserId(HttpSession session) {

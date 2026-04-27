@@ -1,6 +1,6 @@
 package com.ration.controller;
 
-import com.ration.dao.FamilyMemberDAO;
+import com.ration.util.DBConnection;
 
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
@@ -10,7 +10,10 @@ import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
 
 import java.io.IOException;
+import java.sql.Connection;
 import java.sql.Date;
+import java.sql.PreparedStatement;
+import java.sql.SQLException;
 import java.time.LocalDate;
 import java.time.format.DateTimeParseException;
 
@@ -18,13 +21,6 @@ import java.time.format.DateTimeParseException;
 public class FamilyMemberServlet extends HttpServlet {
 
     private static final long serialVersionUID = 1L;
-
-    private FamilyMemberDAO familyMemberDAO;
-
-    @Override
-    public void init() throws ServletException {
-        familyMemberDAO = new FamilyMemberDAO();
-    }
 
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
@@ -59,13 +55,33 @@ public class FamilyMemberServlet extends HttpServlet {
             return;
         }
 
-        boolean saved = familyMemberDAO.addFamilyMember(userId, memberName, relation, aadhaar, parsedDob, gender);
+        boolean saved = saveFamilyMember(userId, memberName, relation, aadhaar, parsedDob, gender);
         if (!saved) {
             response.sendRedirect(request.getContextPath() + "/family.html?error=db_insert_failed");
             return;
         }
 
         response.sendRedirect(request.getContextPath() + "/family.html?success=1");
+    }
+
+    private boolean saveFamilyMember(int userId, String memberName, String relation, String aadhaar, Date dob, String gender) {
+        String sql = "INSERT INTO family_members (user_id, member_name, relation, aadhaar, dob, gender) VALUES (?, ?, ?, ?, ?, ?)";
+
+        try (Connection connection = DBConnection.getConnection();
+             PreparedStatement statement = connection.prepareStatement(sql)) {
+
+            statement.setInt(1, userId);
+            statement.setString(2, memberName);
+            statement.setString(3, relation);
+            statement.setString(4, aadhaar);
+            statement.setDate(5, dob);
+            statement.setString(6, gender);
+            return statement.executeUpdate() > 0;
+
+        } catch (SQLException e) {
+            System.err.println("[FamilyMemberServlet] saveFamilyMember failed: " + e.getMessage());
+            return false;
+        }
     }
 
     private Integer getLoggedInUserId(HttpSession session) {
