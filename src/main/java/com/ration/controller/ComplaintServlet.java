@@ -14,6 +14,8 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 
+import java.io.IOException;
+
 @WebServlet("/ComplaintServlet")
 public class ComplaintServlet extends HttpServlet {
 
@@ -49,6 +51,8 @@ public class ComplaintServlet extends HttpServlet {
             response.sendRedirect(request.getContextPath() + "/complaints.html?error=db_insert_failed");
             return;
         }
+        System.out.printf("[ComplaintServlet] type=%s month=%s descriptionLength=%d%n",
+                complaintType, month, description.length());
 
         response.sendRedirect(request.getContextPath() + "/complaints.html?success=1");
     }

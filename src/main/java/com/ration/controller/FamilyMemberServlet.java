@@ -17,6 +17,8 @@ import java.sql.SQLException;
 import java.time.LocalDate;
 import java.time.format.DateTimeParseException;
 
+import java.io.IOException;
+
 @WebServlet("/FamilyMemberServlet")
 public class FamilyMemberServlet extends HttpServlet {
 
@@ -60,6 +62,12 @@ public class FamilyMemberServlet extends HttpServlet {
             response.sendRedirect(request.getContextPath() + "/family.html?error=db_insert_failed");
             return;
         }
+        System.out.printf("[FamilyMemberServlet] name=%s relation=%s dob=%s gender=%s aadhaarSuffix=%s%n",
+                memberName,
+                relation,
+                dob,
+                gender,
+                aadhaar.length() >= 4 ? aadhaar.substring(aadhaar.length() - 4) : aadhaar);
 
         response.sendRedirect(request.getContextPath() + "/family.html?success=1");
     }
