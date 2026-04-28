@@ -101,9 +101,11 @@ public class AuthFilter implements Filter {
     private boolean isAdminOnlyStaticPage(String path) {
         return "/stock.html".equals(path)
                 || "/approvals.html".equals(path)
+                || "/transactions.html".equals(path)
                 || "/reports.html".equals(path)
                 || "/AdminFamilyServlet".equals(path)
-                || "/StockServlet".equals(path);
+                || "/StockServlet".equals(path)
+                || "/TransactionServlet".equals(path);
     }
 
     /** Pages and servlets that are citizen-only. */
