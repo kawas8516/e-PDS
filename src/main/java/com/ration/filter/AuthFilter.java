@@ -97,17 +97,21 @@ public class AuthFilter implements Filter {
         return false;
     }
 
-    /** Static HTML pages that are admin-only. */
+    /** Pages and servlets that are admin-only. */
     private boolean isAdminOnlyStaticPage(String path) {
         return "/stock.html".equals(path)
                 || "/approvals.html".equals(path)
-                || "/reports.html".equals(path);
+                || "/reports.html".equals(path)
+                || "/AdminFamilyServlet".equals(path)
+                || "/StockServlet".equals(path);
     }
 
-    /** Static HTML pages that are citizen-only. */
+    /** Pages and servlets that are citizen-only. */
     private boolean isCitizenOnlyStaticPage(String path) {
         return "/family.html".equals(path)
                 || "/complaints.html".equals(path)
-                || "/allocation.html".equals(path);
+                || "/allocation.html".equals(path)
+                || "/FamilyMemberServlet".equals(path)
+                || "/ComplaintServlet".equals(path);
     }
 }

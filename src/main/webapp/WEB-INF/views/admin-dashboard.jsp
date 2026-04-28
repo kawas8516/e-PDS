@@ -45,11 +45,14 @@
       <a href="${pageContext.request.contextPath}/approvals.html" class="sidebar-btn w-full flex items-center gap-3 px-4 py-3 rounded-xl">
         <i data-lucide="clock" class="w-5 h-5"></i><span class="font-medium text-sm">New Applications</span>
       </a>
-      <a href="${pageContext.request.contextPath}/stock.html" class="sidebar-btn w-full flex items-center gap-3 px-4 py-3 rounded-xl">
+      <a href="${pageContext.request.contextPath}/StockServlet" class="sidebar-btn w-full flex items-center gap-3 px-4 py-3 rounded-xl">
         <i data-lucide="package" class="w-5 h-5"></i><span class="font-medium text-sm">Stock Management</span>
       </a>
       <a href="${pageContext.request.contextPath}/reports.html" class="sidebar-btn w-full flex items-center gap-3 px-4 py-3 rounded-xl">
         <i data-lucide="file-text" class="w-5 h-5"></i><span class="font-medium text-sm">Reports</span>
+      </a>
+      <a href="${pageContext.request.contextPath}/AdminFamilyServlet" class="sidebar-btn w-full flex items-center gap-3 px-4 py-3 rounded-xl">
+        <i data-lucide="users" class="w-5 h-5"></i><span class="font-medium text-sm">Family Management</span>
       </a>
     </nav>
 

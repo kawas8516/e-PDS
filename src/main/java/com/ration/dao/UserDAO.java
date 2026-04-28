@@ -215,11 +215,12 @@ public class UserDAO {
     //  Returns true if insert succeeded, false otherwise.
     // ─────────────────────────────────────────────────────────────
     public boolean registerUser(String username, String hashedPassword,
-                                String fullName, String email, String mobile) {
+                                String fullName, String email, String mobile,
+                                long annualIncome) {
 
         // Role stored as uppercase to match RBAC checks in AuthFilter and AuthService.
-        String sql = "INSERT INTO users (username, password_hash, full_name, email, mobile, role, is_active) " +
-                     "VALUES (?, ?, ?, ?, ?, 'CITIZEN', TRUE)";
+        String sql = "INSERT INTO users (username, password_hash, full_name, email, mobile, role, is_active, annual_income) " +
+                     "VALUES (?, ?, ?, ?, ?, 'CITIZEN', TRUE, ?)";
 
         try (Connection conn = DBConnection.getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql)) {
@@ -229,6 +230,7 @@ public class UserDAO {
             stmt.setString(3, fullName);
             stmt.setString(4, email);
             stmt.setString(5, mobile);
+            stmt.setLong(6, annualIncome);
 
             return stmt.executeUpdate() > 0;
 

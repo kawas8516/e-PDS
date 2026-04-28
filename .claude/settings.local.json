@@ -6,7 +6,15 @@
       "Bash(jar tf *)",
       "Bash(xargs grep *)",
       "Bash(jar xf *)",
-      "Bash(rm -rf META-INF)"
+      "Bash(rm -rf META-INF)",
+      "mcp__claude_ai_Supabase__list_projects",
+      "mcp__claude_ai_Supabase__list_tables",
+      "mcp__claude_ai_Supabase__apply_migration",
+      "Bash(cd /tmp)",
+      "Bash(javac -cp /home/linuxbrew/.linuxbrew/opt/openjdk/libexec/openjdk.jar hash_passwords.java)",
+      "Read(//c/Users/kaust/**)",
+      "Bash(node *)",
+      "mcp__claude_ai_Supabase__execute_sql"
     ]
   }
 }

@@ -1,5 +1,6 @@
 # Compiled classes
 *.class
+.CLAUDE/
 
 # Build output (Eclipse)
 bin/
@@ -7,6 +8,7 @@ bin/
 # Deployment directory (Dynamic Web Project)
 build/
 tmp/
+CLAUDE.md
 
 # Eclipse project files (ignore these)
 .classpath

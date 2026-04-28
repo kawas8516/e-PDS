@@ -41,13 +41,13 @@
       <a href="${pageContext.request.contextPath}/citizen-dashboard.jsp" class="sidebar-btn active w-full flex items-center gap-3 px-4 py-3 rounded-xl">
         <i data-lucide="layout-dashboard" class="w-5 h-5"></i><span class="font-medium text-sm">Dashboard</span>
       </a>
-      <a href="${pageContext.request.contextPath}/family.html" class="sidebar-btn w-full flex items-center gap-3 px-4 py-3 rounded-xl">
+      <a href="${pageContext.request.contextPath}/FamilyMemberServlet" class="sidebar-btn w-full flex items-center gap-3 px-4 py-3 rounded-xl">
         <i data-lucide="users" class="w-5 h-5"></i><span class="font-medium text-sm">Family Members</span>
       </a>
       <a href="${pageContext.request.contextPath}/allocation.html" class="sidebar-btn w-full flex items-center gap-3 px-4 py-3 rounded-xl">
         <i data-lucide="clipboard-list" class="w-5 h-5"></i><span class="font-medium text-sm">Monthly Quota</span>
       </a>
-      <a href="${pageContext.request.contextPath}/complaints.html" class="sidebar-btn w-full flex items-center gap-3 px-4 py-3 rounded-xl">
+      <a href="${pageContext.request.contextPath}/ComplaintServlet" class="sidebar-btn w-full flex items-center gap-3 px-4 py-3 rounded-xl">
         <i data-lucide="alert-circle" class="w-5 h-5"></i><span class="font-medium text-sm">Complaints</span>
       </a>
     </nav>
@@ -135,7 +135,7 @@
         <h3 class="text-base font-bold text-slate-800">Family Members</h3>
         <div class="text-6xl font-black text-slate-800 my-3">03</div>
         <p class="text-[10px] text-slate-400 uppercase font-bold tracking-widest">Verified Units</p>
-        <a href="${pageContext.request.contextPath}/family.html" class="mt-6 text-blue-600 text-sm font-bold hover:underline flex items-center gap-1">
+        <a href="${pageContext.request.contextPath}/FamilyMemberServlet" class="mt-6 text-blue-600 text-sm font-bold hover:underline flex items-center gap-1">
           Manage Members <i data-lucide="arrow-right" class="w-4 h-4"></i>
         </a>
       </div>
@@ -149,14 +149,14 @@
           <p class="text-sm font-bold text-slate-700">Monthly Quota</p>
           <p class="text-xs text-slate-400 mt-0.5">View entitlement</p>
         </a>
-        <a href="${pageContext.request.contextPath}/family.html" class="bg-white rounded-2xl p-5 shadow-sm border border-slate-200 hover:border-blue-300 hover:shadow-md transition-all text-center group">
+        <a href="${pageContext.request.contextPath}/FamilyMemberServlet" class="bg-white rounded-2xl p-5 shadow-sm border border-slate-200 hover:border-blue-300 hover:shadow-md transition-all text-center group">
           <div class="w-12 h-12 bg-blue-50 text-blue-600 rounded-xl flex items-center justify-center mx-auto mb-3 group-hover:bg-blue-100 transition-all">
             <i data-lucide="user-plus" class="w-6 h-6"></i>
           </div>
           <p class="text-sm font-bold text-slate-700">Add Member</p>
           <p class="text-xs text-slate-400 mt-0.5">Update family</p>
         </a>
-        <a href="${pageContext.request.contextPath}/complaints.html" class="bg-white rounded-2xl p-5 shadow-sm border border-slate-200 hover:border-blue-300 hover:shadow-md transition-all text-center group">
+        <a href="${pageContext.request.contextPath}/ComplaintServlet" class="bg-white rounded-2xl p-5 shadow-sm border border-slate-200 hover:border-blue-300 hover:shadow-md transition-all text-center group">
           <div class="w-12 h-12 bg-red-50 text-red-500 rounded-xl flex items-center justify-center mx-auto mb-3 group-hover:bg-red-100 transition-all">
             <i data-lucide="message-square-warning" class="w-6 h-6"></i>
           </div>

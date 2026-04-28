@@ -92,6 +92,12 @@
                         <label class="text-xs font-bold text-slate-500 uppercase">Phone Number</label>
                         <input type="tel" name="phone" value="${prevPhone}" required class="w-full px-4 py-3 rounded-xl bg-slate-50 border border-slate-200 focus:ring-2 focus:ring-blue-500 outline-none">
                     </div>
+                    <div class="space-y-1">
+                        <label class="text-xs font-bold text-slate-500 uppercase">Annual Household Income (₹)</label>
+                        <input type="number" name="annualIncome" min="0" placeholder="e.g. 80000" required
+                            class="w-full px-4 py-3 rounded-xl bg-slate-50 border border-slate-200 focus:ring-2 focus:ring-blue-500 outline-none">
+                        <p class="text-[10px] text-slate-400 mt-1">Families with income ≤ ₹1,00,000/year qualify as BPL.</p>
+                    </div>
                 </div>
                 <div class="flex items-center gap-2 pt-4">
                     <input type="checkbox" id="terms" required class="w-4 h-4 rounded">

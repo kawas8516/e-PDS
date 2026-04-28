@@ -58,6 +58,13 @@ public class RegisterServlet extends HttpServlet {
         String mobile = trim(request.getParameter("phone"));
         String password = request.getParameter("password");
         String confirmPassword = request.getParameter("confirmPassword");
+        long annualIncome = 0;
+        try {
+            String incomeStr = trim(request.getParameter("annualIncome"));
+            if (incomeStr != null && !incomeStr.isEmpty()) {
+                annualIncome = Long.parseLong(incomeStr.replaceAll("[^0-9]", ""));
+            }
+        } catch (NumberFormatException ignored) { }
 
         // --- Validation ---
 
@@ -97,7 +104,7 @@ public class RegisterServlet extends HttpServlet {
 
         String hashedPassword = PasswordUtil.hashPassword(password);
         try {
-            boolean success = userDAO.registerUser(username, hashedPassword, fullName, email, mobile);
+            boolean success = userDAO.registerUser(username, hashedPassword, fullName, email, mobile, annualIncome);
             if (success) {
                 request.setAttribute("successMessage", "Registration successful! You can now log in.");
                 request.getRequestDispatcher("/WEB-INF/views/register-success.jsp").forward(request, response);
